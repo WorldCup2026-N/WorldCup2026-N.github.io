@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مونديال التوقعات - كأس العالم 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #7e22ce;
+            --primary-dark: #4c1d95; --primary-light: #a855f7;
+            --secondary: #d4af37; --secondary-light: #fef08a; --accent: #c026d3;
+            --dark: #0f0728; --dark-card: #2e1065; --text: #f8fafc; --text-muted: #cbd5e1;
+            --gold-gradient: linear-gradient(135deg, #d4af37 0%, #f0d878 50%, #d4af37 100%);
+            --purple-gradient: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Almarai', sans-serif;
+            background: var(--dark);
+            color: var(--text); min-height: 100vh; overflow-x: hidden; position: relative;
+        }
+
+        .en-num { font-family: 'Arial', sans-serif; direction: ltr !important; display: inline-block; }
+
+        .top-widget { background-color: #2b0b3f; padding: 10px 0; position: relative; border-bottom: 2px solid var(--secondary); width: 100%; }
+        .header-main { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; flex-wrap: wrap; gap: 15px; }
+        .tournament-branding { display: flex; align-items: center; gap: 15px; }
+        .tournament-logo {
+            width: 50px; height: 50px; background: var(--text); border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; color: var(--primary-dark); font-size: 1.5rem;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+
+        .countdown-box { background: rgba(0,0,0,0.4); padding: 8px 20px; border-radius: 8px; border: 1px solid var(--secondary); text-align: center; }
+        .countdown-label { font-size: 0.85rem; color: var(--secondary-light); font-weight: 800; margin-bottom: 5px; display: block;}
+        .countdown-timer { font-weight: 800; }
+
+        .user-nav { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .user-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--secondary); }
+
+        .btn { padding: 8px 18px; border: none; border-radius: 8px; cursor: pointer; font-family: 'Almarai', sans-serif; font-weight: 800; font-size: 0.9rem; transition: all 0.3s; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-gold { background: var(--gold-gradient); color: var(--dark); }
+        .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); }
+        .btn-primary { background: var(--primary-light); color: white; }
+        .btn-danger { background: #e11d48; color: white; }
+        .w-full { width: 100%; }
+        .mt-10 { margin-top: 10px; }
+        .hidden { display: none !important; }
+
+        .world-clocks-banner { background: #1e1b4b; border-bottom: 2px solid var(--secondary); padding: 12px 0; overflow: hidden; display: none; }
+        .clocks-grid { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; padding: 0 15px; }
+        .clock-widget { background: rgba(0,0,0,0.5); border: 1px solid rgba(212, 175, 55, 0.4); padding: 8px 15px; border-radius: 8px; text-align: center; min-width: 120px; animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        .clock-widget-city { font-size: 0.9rem; font-weight: 800; color: var(--secondary-light); border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 5px; padding-bottom: 3px; }
+        .clock-widget-time { font-size: 1.15rem; font-weight: 800; color: white; direction: ltr; }
+
+        .news-ticker { background: linear-gradient(90deg, var(--dark-card) 0%, var(--primary-dark) 100%); padding: 12px 0; position: relative; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .news-ticker-label { position: absolute; right: 0; top: 0; bottom: 0; background: var(--accent); padding: 0 20px; display: flex; align-items: center; font-weight: 800; z-index: 10; box-shadow: -5px 0 15px rgba(0,0,0,0.5); }
+        .ticker-wrapper { overflow: hidden; padding-right: 130px; position: relative; }
+        .ticker-content { display: inline-block; white-space: nowrap; animation: tickerLTR 25s linear infinite; }
+        .ticker-item { display: inline-flex; padding: 0 30px; font-weight: 700; font-size: 1rem; align-items: center; gap: 8px; }
+        .ticker-item::before { content: '⚽'; font-size: 0.8rem; }
+        @keyframes tickerLTR { 0% { transform: translateX(-100vw); } 100% { transform: translateX(100%); } }
+
+        .main-container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+        .section-box { background: var(--dark-card); border-radius: 16px; padding: 20px; margin-bottom: 25px; border: 1px solid rgba(212, 175, 55, 0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .section-title { font-size: 1.3rem; font-weight: 800; color: var(--secondary-light); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
+
+        .gold-points-frame { background: linear-gradient(135deg, #2e1065 0%, #1e1b4b 100%); border: 4px solid transparent; border-image: var(--gold-gradient) 1; border-radius: 20px; padding: 25px; text-align: center; margin-bottom: 25px; position: relative; box-shadow: 0 0 20px rgba(212, 175, 55, 0.3), inset 0 0 20px rgba(212, 175, 55, 0.1); }
+        .points-val { font-size: 4rem; font-weight: 800; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .points-desc { color: var(--secondary-light); font-weight: 700; cursor: pointer; text-decoration: underline; margin-top: 10px; }
+
+        .tabs-nav { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 12px; }
+        .tab-btn { padding: 12px 20px; border: none; background: transparent; color: var(--text-muted); font-family: inherit; font-weight: 800; cursor: pointer; border-radius: 8px; transition: all 0.3s; flex-grow: 1; text-align: center; font-size: 1rem; }
+        .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(126, 34, 206, 0.5); }
+        .tab-content { display: none; } .tab-content.active { display: block; animation: fadeInContent 0.4s; }
+        @keyframes fadeInContent { from { opacity: 0; } to { opacity: 1; } }
+
+        .matches-split { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+        .groups-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 20px; direction: rtl; }
+        .group-card { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 15px; border: 1px solid rgba(255,255,255,0.05); }
+        .group-header { font-weight: 800; color: var(--secondary-light); margin-bottom: 15px; text-align: center; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; }
+        .team-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); align-items: center; gap: 10px;}
+        .team-row:last-child { border-bottom: none; }
+        .qualifier { border-right: 3px solid #4ade80; background: rgba(74, 222, 128, 0.05); }
+        .team-name-col { flex-shrink: 0; width: 110px; font-weight: 800; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .team-stats { display: flex; gap: 8px; font-size: 0.85rem; font-weight: 800; flex-grow: 1; justify-content: space-between; direction: rtl;}
+        .stat-col { text-align: center; min-width: 20px; }
+
+        .match-card { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); position: relative; overflow: hidden; }
+        .match-header { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 15px;}
+        
+        .score-input { width: 60px; height: 50px; text-align: center; background: rgba(0,0,0,0.5); border: 2px solid var(--secondary); color: var(--text); border-radius: 8px; font-size: 1.5rem; font-weight: 800;}
+        .joker-btn { background: rgba(212,175,55,0.1); border: 2px solid var(--secondary); padding: 8px 15px; border-radius: 8px; cursor: pointer; color: var(--secondary-light); font-weight: 800; transition: 0.3s; font-family: inherit;}
+        .joker-btn.active { background: var(--secondary); color: var(--dark); box-shadow: 0 0 15px var(--secondary); transform: scale(1.05);}
+        .match-timer { font-size: 1rem; color: var(--accent); font-weight: 800; background: rgba(0,0,0,0.3); padding: 3px 10px; border-radius: 5px;}
+
+        .daily-q-box { text-align: center; padding: 30px; background: linear-gradient(135deg, var(--primary-dark), var(--dark-card)); border-radius: 16px; border: 2px solid var(--accent);}
+        .q-text { font-size: 1.4rem; font-weight: 800; margin-bottom: 20px; color: var(--secondary-light); }
+        .q-input { width: 100%; max-width: 400px; padding: 15px; border-radius: 8px; border: 2px solid var(--primary-light); background: rgba(0,0,0,0.6); color: var(--text); font-family: inherit; font-size: 1.1rem; margin-bottom: 15px;}
+        
+        .leaderboard-table { width: 100%; border-collapse: collapse; text-align: center; }
+        .leaderboard-table th { background: rgba(255,255,255,0.1); padding: 15px; color: var(--secondary-light); font-weight: 800; text-align: center; }
+        .leaderboard-table td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-weight: 700; text-align: center; vertical-align: middle;}
+        .leaderboard-table th:nth-child(2), .leaderboard-table td:nth-child(2) { text-align: right; }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: var(--dark-card); padding: 30px; border-radius: 16px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; border: 2px solid var(--primary-light); position: relative; }
+        .close-btn { position: absolute; top: 15px; left: 15px; background: none; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; z-index: 10; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 800; color: var(--secondary-light); }
+        .form-hint { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px; }
+        .form-control { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: var(--text); font-family: inherit; }
+        
+        .editor-toolbar { display:flex; gap:5px; flex-wrap:wrap; background:rgba(255,255,255,0.1); padding:8px; border-radius:8px 8px 0 0; align-items: center;}
+        .editor-toolbar button { background:var(--dark); color:var(--text); border:1px solid var(--secondary); border-radius:4px; padding:5px 10px; cursor:pointer; transition:0.2s;}
+        .editor-toolbar button:hover { background:var(--primary); color:white;}
+        .editor-content { background:rgba(0,0,0,0.3); color:var(--text); min-height:120px; border:1px solid rgba(255,255,255,0.2); border-radius:0 0 8px 8px; padding:10px; outline:none; font-family: inherit; }
+
+        .online-badge { position: fixed; bottom: 20px; left: 20px; background: transparent; padding: 10px; border: none; z-index: 100; font-weight: 800; display: flex; align-items: center; gap: 10px; color: white; text-shadow: 0 2px 5px rgba(0,0,0,0.8);}
+        .dot { width: 10px; height: 10px; background: #4ade80; border-radius: 50%; box-shadow: 0 0 10px #4ade80; animation: blink 2s infinite; }
+        @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+        .ad-container { position: relative; z-index: 50; text-align: center; margin: 15px 0; }
+        .ad-floating { position: fixed; z-index: 1500; top: 50%; transform: translateY(-50%); max-width: 200px; }
+        .ad-right { right: 15px; } .ad-left { left: 15px; }
+        .ad-media { max-width: 100%; max-height: 200px; object-fit: contain; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .ad-media-img { cursor: pointer; transition: transform 0.3s; }
+        .ad-media-img:hover { transform: scale(1.05); }
+
+        .rules-list li { margin-bottom: 10px; }
+        .rules-list strong { color: var(--text); }
+
+        @media (max-width: 992px) { .matches-split { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) {
+            .header-main { flex-direction: column; text-align: center; }
+            .groups-grid { grid-template-columns: 1fr; }
+            .ad-floating { display: none; } 
+        }
+    </style>
+</head>
+<body>
+
+    <header class="top-widget" id="headerTop">
+        <div class="header-main">
+            <div class="tournament-branding">
+                <div class="tournament-logo"><i class="fas fa-trophy"></i></div>
+                <div>
+                    <h1 style="font-size: 1.2rem; font-weight: 800;">مونديال التوقعات</h1>
+                    <div style="font-size: 0.9rem; color: var(--secondary-light); font-weight: bold;">كأس العالم <span class="en-num">2026</span></div>
+                </div>
+            </div>
+            <div class="countdown-box">
+                <span class="countdown-label">موعد انطلاق البطولة</span>
+                <div class="countdown-timer" id="mainCountdown">جاري الحساب...</div>
+            </div>
+            <div class="user-nav" id="userNav"></div>
+        </div>
+    </header>
+
+    <div class="world-clocks-banner" id="worldClocksBanner">
+        <div class="clocks-grid" id="clocksGrid"></div>
+    </div>
+
+    <div class="news-ticker">
+        <div class="news-ticker-label">آخر الأخبار</div>
+        <div class="ticker-wrapper">
+            <div class="ticker-content" id="newsTickerContent"></div>
+        </div>
+    </div>
+
+    <div class="main-container" id="mainWrapper">
+        
+        <div class="gold-points-frame hidden" id="userPointsSection">
+            <h3 style="color: var(--text); margin-bottom: 10px;">🏆 رصيد نقاطك الإجمالي</h3>
+            <div class="points-val en-num" id="userTotalPoints">0</div>
+            <div class="points-desc" onclick="showPointsDetails()">كيف حصلت على هذه النقاط ؟ اضغط هنا</div>
+        </div>
+
+        <div class="tabs-nav">
+            <button class="tab-btn active" onclick="switchTab('rulesTab')">📜 شروط المسابقة</button>
+            <button class="tab-btn" onclick="switchTab('matchesTab')">📅 المباريات والتوقعات</button>
+            <button class="tab-btn" onclick="switchTab('groupsTab')">📊 ترتيب المجموعات</button>
+            <button class="tab-btn" onclick="switchTab('dailyTab')">❓ سؤال المونديال</button>
+            <button class="tab-btn" onclick="switchTab('leaderboardTab')">👑 لوحة الصدارة</button>
+        </div>
+
+        <div class="tab-content active" id="rulesTab">
+            <div class="section-box">
+                <div class="section-title"><i class="fas fa-gavel"></i> شروط المسابقة وآلية احتساب النقاط</div>
+                <div style="line-height: 1.8; color: var(--text-muted); font-size: 1.1rem; padding: 10px;">
+                    <h3 style="color: var(--secondary-light); margin-bottom: 10px;">🏆 الهدف من المسابقة</h3>
+                    <p style="margin-bottom: 20px;">الفائز في المسابقة هو من يجمع <strong>أكبر عدد ممكن من النقاط</strong> من خلال التوقعات الصحيحة لنتائج المباريات والإجابات الصحيحة للسؤال اليومي مجتمعة في رصيد واحد.</p>
+                    
+                    <h3 style="color: var(--secondary-light); margin-bottom: 10px;">📅 أولاً: نقاط المباريات والتوقعات</h3>
+                    <ul class="rules-list" style="list-style-position: inside; margin-bottom: 25px;">
+                        <li><strong>توقع النتيجة الدقيقة:</strong> إذا توقعت النتيجة بالأرقام بشكل صحيح تماماً، تحصل على <span class="en-num" style="color:var(--accent); font-weight:bold;">3</span> نقاط.</li>
+                        <li><strong>توقع الفائز أو التعادل (بنتيجة مختلفة):</strong> إذا توقعت الفريق الفائز بشكل صحيح ولكن النتيجة الرقمية مختلفة، تحصل على <span class="en-num" style="color:var(--accent); font-weight:bold;">1</span> نقطة.</li>
+                        <li><strong>استخدام بطاقة الجوكر (🃏):</strong> الجوكر يضاعف نقاطك في المباراة التي تستخدمه فيها (النتيجة الدقيقة = <span class="en-num" style="color:var(--accent); font-weight:bold;">6</span> نقاط، توقع الفائز = <span class="en-num" style="color:var(--accent); font-weight:bold;">2</span> نقطة). </li>
+                        <li style="color:var(--secondary-light); padding:10px; background:rgba(212, 175, 55, 0.1); border-radius:8px; border:1px solid var(--secondary);"><strong>عدد مرات استخدام الجوكر المسموحة (5 مرات إجمالاً):</strong><br>
+                            - يُسمح باستخدام الجوكر <strong>(3) مرات</strong> في (3) مباريات مختلفة ضمن دور المجموعات.<br>
+                            - يُسمح باستخدامه <strong>مرة واحدة</strong> فقط في دور الـ(32).<br>
+                            - يُسمح باستخدامه <strong>مرة واحدة</strong> فقط في دور الـ(16).
+                        </li>
+                        <li><strong>توقع خاطئ:</strong> لا تحصل على أي نقطة.</li>
+                    </ul>
+
+                    <h3 style="color: var(--secondary-light); margin-bottom: 10px;">❓ ثانياً: نقاط السؤال اليومي</h3>
+                    <p style="margin-bottom: 10px;">يُطرح سؤال يومياً وسرعة الإجابة تلعب دوراً أساسياً في حصد النقاط كالتالي:</p>
+                    <ul class="rules-list" style="list-style-position: inside; margin-bottom: 25px;">
+                        <li><strong>أول متسابق يجيب إجابة صحيحة:</strong> يحصل على <span class="en-num" style="color:var(--accent); font-weight:bold;">4</span> نقاط.</li>
+                        <li><strong>ثاني وثالث متسابق يجيب إجابة صحيحة:</strong> يحصل كل منهما على <span class="en-num" style="color:var(--accent); font-weight:bold;">1</span> نقطة.</li>
+                    </ul>
+
+                    <h3 style="color: var(--secondary-light); margin-bottom: 10px;">⚖️ ثالثاً: قوانين إضافية وحسم التعادل</h3>
+                    <ul class="rules-list" style="list-style-position: inside;">
+                        <li><strong>مباريات خروج المغلوب:</strong> في الأدوار الإقصائية التي تنتهي بالتعادل، لن يُنظر في مسابقة التوقعات إلى نتيجة ركلات الترجيح، وإنما سيتم الاعتماد على نتيجة التعادل التي انتهت عليها الأشواط الأصلية والإضافية.</li>
+                        <li><strong>كسر التعادل:</strong> في حال تعادل رصيد متسابقين اثنين أو أكثر في لوحة الصدارة، فإن الفيصل هو <strong>وقت وتاريخ تسجيل كل متسابق</strong>، حيث أن العضو الذي سجل في الموقع أولاً سيكون في ترتيب أعلى.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="matchesTab">
+            <div class="matches-split">
+                <div class="section-box">
+                    <div class="section-title"><i class="fas fa-clock"></i> المباريات القادمة</div>
+                    <div id="upcomingMatches"></div>
+                </div>
+                <div class="section-box" style="background: rgba(46, 16, 101, 0.6); border-color: rgba(255,255,255,0.1);">
+                    <div class="section-title"><i class="fas fa-check-circle"></i> المباريات السابقة</div>
+                    <div id="pastMatches"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="groupsTab">
+            <div class="section-box">
+                <div class="section-title"><i class="fas fa-list-ol"></i> ترتيب المجموعات</div>
+                <div class="groups-grid" id="groupsGrid"></div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="dailyTab">
+            <div class="section-box daily-q-box" style="margin-bottom: 30px;">
+                <div class="section-title" style="justify-content: center; border:none;"><i class="fas fa-brain"></i> سؤال المونديال اليومي</div>
+                <div id="activeQuestionArea"></div>
+            </div>
+            
+            <div class="section-box">
+                <div class="section-title"><i class="fas fa-archive"></i> أرشيف أسئلة المونديال</div>
+                <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:15px;">يتحول السؤال اليومي إلى الأرشيف تلقائياً في تمام الساعة 12 ظهراً، ويمكن للأعضاء الجدد الإطلاع على أرشيف الأسئلة السابقة.</p>
+                <div id="archiveQuestionsArea"></div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="leaderboardTab">
+            <div class="section-box">
+                <div class="section-title"><i class="fas fa-crown"></i> لوحة الصدارة</div>
+                <table class="leaderboard-table">
+                    <thead><tr><th>الترتيب</th><th>المتسابق</th><th>مجموع النقاط</th></tr></thead>
+                    <tbody id="leaderboardBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="section-box hidden" id="adminPanel" style="border-color: #e11d48;">
+            <div class="section-title" style="color: #e11d48;"><i class="fas fa-cogs"></i> لوحة تحكم الإدارة</div>
+            <div class="groups-grid">
+                
+                <div class="group-card" style="border: 2px solid #e11d48;">
+                    <h4 style="color: var(--secondary-light);">إضافة مباراة قادمة</h4>
+                    <select id="adminNewMatchTeam1" class="form-control mt-10"></select>
+                    <select id="adminNewMatchTeam2" class="form-control mt-10"></select>
+                    <select id="adminNewMatchStage" class="form-control mt-10">
+                        <option value="المجموعات">دور المجموعات</option>
+                        <option value="دور الـ32">دور الـ32</option>
+                        <option value="دور الـ16">دور الـ16</option>
+                        <option value="دور الثمانية">دور الثمانية</option>
+                        <option value="نصف النهائي">نصف النهائي</option>
+                        <option value="تحديد المركز الثالث">مباراة تحديد المركز الثالث</option>
+                        <option value="النهائي">النهائي</option>
+                    </select>
+                    <label class="mt-10" style="font-size:0.8rem; color:var(--text-muted); display:block;">تاريخ ووقت المباراة:</label>
+                    <input type="datetime-local" id="adminNewMatchDate" class="form-control en-num" style="direction: ltr; text-align: left;">
+                    <button class="btn btn-danger w-full mt-10" onclick="adminAddNewMatch()">إضافة إلى المباريات القادمة</button>
+                </div>
+
+                <div class="group-card">
+                    <h4>تحديث نتيجة مباراة (إنهاء)</h4>
+                    <select id="adminMatchSelect" class="form-control mt-10" onchange="updateAdminScoreLabels()"></select>
+                    
+                    <div style="display: flex; gap:10px; margin-top:15px; align-items:center; justify-content:center; background: rgba(0,0,0,0.2); padding: 15px 10px; border-radius: 8px;">
+                        <span id="lblTeam1" style="font-weight:800; color:var(--secondary-light); flex:1; text-align:left;">الفريق الأول</span>
+                        <div style="display: flex; gap: 8px; direction: rtl;">
+                            <input type="number" id="adminScore1" class="form-control en-num" style="width:65px; text-align:center; font-size:1.2rem; padding:8px;" placeholder="0">
+                            <span style="color:var(--accent); font-weight:bold; font-size:1.5rem; align-self: center;">-</span>
+                            <input type="number" id="adminScore2" class="form-control en-num" style="width:65px; text-align:center; font-size:1.2rem; padding:8px;" placeholder="0">
+                        </div>
+                        <span id="lblTeam2" style="font-weight:800; color:var(--secondary-light); flex:1; text-align:right;">الفريق الثاني</span>
+                    </div>
+                    
+                    <button class="btn btn-danger w-full mt-10" onclick="adminSaveMatch()">اعتماد النتيجة وإنهاء المباراة</button>
+                </div>
+                
+                <div class="group-card">
+                    <h4 style="color:var(--accent);">طرح سؤال المونديال اليومي</h4>
+                    <input type="text" id="adminQText" class="form-control mt-10" placeholder="نص السؤال...">
+                    
+                    <label class="mt-10" style="display:block; color:var(--secondary-light); font-size:0.9rem;">تحديد وقت نشر السؤال مستقبلاً (اختياري، اتركه فارغاً للنشر الفوري):</label>
+                    <input type="datetime-local" id="adminQPublishTime" class="form-control en-num" style="direction: ltr; text-align: left;">
+
+                    <label class="mt-10" style="display:block; color:var(--secondary-light); font-size:0.9rem;">نماذج الإجابة الصحيحة (أدخل إجابة واحدة على الأقل، بحد أقصى 10 إجابات محتملة للمطابقة):</label>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+                        <input type="text" id="adminQAns1" class="form-control" placeholder="إجابة 1 (مطلوب)">
+                        <input type="text" id="adminQAns2" class="form-control" placeholder="إجابة 2 (اختياري)">
+                        <input type="text" id="adminQAns3" class="form-control" placeholder="إجابة 3 (اختياري)">
+                        <input type="text" id="adminQAns4" class="form-control" placeholder="إجابة 4 (اختياري)">
+                        <input type="text" id="adminQAns5" class="form-control" placeholder="إجابة 5 (اختياري)">
+                        <input type="text" id="adminQAns6" class="form-control" placeholder="إجابة 6 (اختياري)">
+                        <input type="text" id="adminQAns7" class="form-control" placeholder="إجابة 7 (اختياري)">
+                        <input type="text" id="adminQAns8" class="form-control" placeholder="إجابة 8 (اختياري)">
+                        <input type="text" id="adminQAns9" class="form-control" placeholder="إجابة 9 (اختياري)">
+                        <input type="text" id="adminQAns10" class="form-control" placeholder="إجابة 10 (اختياري)">
+                    </div>
+                    <button class="btn btn-primary w-full mt-10" onclick="adminPostQuestion()">نشر السؤال</button>
+                </div>
+
+                <div class="group-card">
+                    <h4>إضافة مساحة إعلانية</h4>
+                    <select id="adminAdType" class="form-control mt-10" onchange="document.getElementById('adImageInputGroup').classList.toggle('hidden', this.value==='text'); document.getElementById('adTextInputGroup').classList.toggle('hidden', this.value==='image');">
+                        <option value="image">إعلان صورة</option>
+                        <option value="text">إعلان نصي</option>
+                    </select>
+
+                    <div id="adImageInputGroup">
+                        <input type="file" id="adminAdFile" accept="image/*" class="form-control mt-10">
+                    </div>
+                    
+                    <div id="adTextInputGroup" class="hidden">
+                        <input type="text" id="adminAdText" class="form-control mt-10" placeholder="اكتب النص الإعلاني هنا...">
+                        <div style="display:flex; align-items:center; gap:10px; margin-top:10px;">
+                            <label style="color:var(--secondary-light); font-weight:bold;">لون النص:</label>
+                            <input type="color" id="adminAdColor" value="#ffffff" style="height:35px; border:none; cursor:pointer; background:transparent;">
+                        </div>
+                    </div>
+
+                    <input type="text" id="adminAdLink" class="form-control mt-10" placeholder="رابط التوجيه عند الضغط (اختياري)...">
+                    <select id="adminAdPosition" class="form-control mt-10">
+                        <option value="top">أعلى الصفحة (عام)</option>
+                        <option value="bottom">أسفل الصفحة (عام)</option>
+                        <option value="right">الجانب الأيمن (عائم)</option>
+                        <option value="left">الجانب الأيسر (عائم)</option>
+                    </select>
+                    <select id="adminAdTarget" class="form-control mt-10">
+                        <option value="all">الظهور في جميع الأقسام</option>
+                        <option value="rulesTab">قسم شروط المسابقة فقط</option>
+                        <option value="matchesTab">قسم المباريات والتوقعات فقط</option>
+                        <option value="groupsTab">قسم ترتيب المجموعات فقط</option>
+                        <option value="dailyTab">قسم السؤال اليومي فقط</option>
+                        <option value="leaderboardTab">لوحة الصدارة فقط</option>
+                    </select>
+                    <button class="btn btn-danger w-full mt-10" onclick="adminAddAd()">نشر الإعلان</button>
+                    <hr style="border-color:rgba(255,255,255,0.1); margin:15px 0;">
+                    <div id="adminAdsList" style="max-height: 120px; overflow-y: auto;"></div>
+                </div>
+
+                <div class="group-card" style="grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px;">
+                    <div>
+                        <h4>إرسال رسالة جماعية (محرر متقدم)</h4>
+                        <div class="editor-toolbar mt-10">
+                            <button type="button" title="عريض" onclick="document.execCommand('bold',false,null)"><i class="fas fa-bold"></i></button>
+                            <button type="button" title="مائل" onclick="document.execCommand('italic',false,null)"><i class="fas fa-italic"></i></button>
+                            <button type="button" title="تسطير" onclick="document.execCommand('underline',false,null)"><i class="fas fa-underline"></i></button>
+                            <button type="button" title="محاذاة لليمين" onclick="document.execCommand('justifyRight',false,null)"><i class="fas fa-align-right"></i></button>
+                            <button type="button" title="توسيط" onclick="document.execCommand('justifyCenter',false,null)"><i class="fas fa-align-center"></i></button>
+                            <button type="button" title="محاذاة لليسار" onclick="document.execCommand('justifyLeft',false,null)"><i class="fas fa-align-left"></i></button>
+                            <button type="button" title="تكبير" onclick="document.execCommand('fontSize',false,'5')">A+</button>
+                            <button type="button" title="تصغير" onclick="document.execCommand('fontSize',false,'2')">A-</button>
+                            <input type="color" title="لون النص" onchange="document.execCommand('foreColor',false,this.value)" style="height:30px; width:30px; cursor:pointer; padding:0; border:none; background:transparent;">
+                            
+                            <select title="إدراج إيموجي" onchange="if(this.value){document.execCommand('insertText',false,this.value); this.selectedIndex=0;}" style="background:var(--dark); color:var(--text); border:1px solid var(--secondary); border-radius:4px; padding:5px; cursor:pointer;">
+                                <option value="">😀 إدراج إيموجي</option>
+                                <optgroup label="كرة القدم والرياضة">
+                                    <option value="⚽">⚽ كرة قدم</option>
+                                    <option value="🏆">🏆 كأس البطولة</option>
+                                    <option value="🥇">🥇 ميدالية ذهبية</option>
+                                    <option value="🥈">🥈 ميدالية فضية</option>
+                                    <option value="🥉">🥉 ميدالية برونزية</option>
+                                    <option value="🏟️">🏟️ ملعب</option>
+                                    <option value="🥅">🥅 مرمى</option>
+                                    <option value="🧤">🧤 قفازات</option>
+                                    <option value="👟">👟 حذاء رياضي</option>
+                                    <option value="🟨">🟨 بطاقة صفراء</option>
+                                    <option value="🟥">🟥 بطاقة حمراء</option>
+                                    <option value="🏃‍♂️">🏃‍♂️ لاعب يركض</option>
+                                </optgroup>
+                                <optgroup label="وجوه تعبيرية">
+                                    <option value="😀">😀 ابتسامة</option>
+                                    <option value="😂">😂 ضحك</option>
+                                    <option value="😎">😎 ثقة</option>
+                                    <option value="🤔">🤔 تفكير</option>
+                                    <option value="😡">😡 غضب</option>
+                                    <option value="🥳">🥳 احتفال</option>
+                                    <option value="🤩">🤩 مبهر</option>
+                                    <option value="🤯">🤯 صدمة</option>
+                                    <option value="😭">😭 بكاء</option>
+                                    <option value="🥵">🥵 حماس/إرهاق</option>
+                                    <option value="🤫">🤫 صمت</option>
+                                    <option value="😜">😜 مرح</option>
+                                </optgroup>
+                                <optgroup label="تفاعلات وإشارات">
+                                    <option value="🔥">🔥 نار / حماس</option>
+                                    <option value="👏">👏 تصفيق</option>
+                                    <option value="👍">👍 ممتاز</option>
+                                    <option value="👎">👎 سيء</option>
+                                    <option value="❤️">❤️ قلب</option>
+                                    <option value="⭐">⭐ نجمة</option>
+                                    <option value="🛑">🛑 قف / توقف</option>
+                                    <option value="⚠️">⚠️ تنبيه</option>
+                                    <option value="💡">💡 فكرة</option>
+                                    <option value="📌">📌 تثبيت / ملاحظة</option>
+                                    <option value="📢">📢 إعلان</option>
+                                    <option value="🔔">🔔 جرس / إشعار</option>
+                                    <option value="⏳">⏳ وقت</option>
+                                    <option value="🎯">🎯 هدف / تركيز</option>
+                                    <option value="✅">✅ صح</option>
+                                    <option value="❌">❌ خطأ</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div id="adminBroadcastMsg" class="editor-content" contenteditable="true">اكتب رسالتك هنا...</div>
+                        
+                        <select id="adminBroadcastType" class="form-control mt-10">
+                            <option value="info">رسالة عادية (تتطلب فهمت)</option>
+                            <option value="yesno">تصويت (نعم / لا)</option>
+                            <option value="input">طلب رأي (نصي)</option>
+                        </select>
+                        <button class="btn btn-danger w-full mt-10" onclick="adminSendBroadcast()">إرسال للجميع</button>
+                    </div>
+                    <div>
+                        <h4 style="color:var(--secondary-light);">سجل الرسائل الجماعية السابقة</h4>
+                        <div id="adminBroadcastHistory" style="max-height: 250px; overflow-y: auto; margin-top:10px; border:1px solid rgba(255,255,255,0.1); padding:10px; border-radius:8px;"></div>
+                    </div>
+                </div>
+
+                <div class="group-card" style="grid-column: 1 / -1;">
+                    <h4 style="color:var(--secondary-light); margin-bottom: 15px;"><i class="fas fa-users"></i> بيانات المتسابقين المسجلين بالموقع</h4>
+                    <div style="max-height: 300px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;">
+                        <table class="leaderboard-table" style="font-size: 0.9rem;">
+                            <thead style="position: sticky; top: 0; background: var(--dark-card);">
+                                <tr>
+                                    <th style="text-align: center;">الاسم الحقيقي</th>
+                                    <th style="text-align: center;">الجوال</th>
+                                    <th style="text-align: center;">الاسم المستعار</th>
+                                    <th style="text-align: center;">الرقم السري</th>
+                                    <th style="text-align: center;">تاريخ التسجيل</th>
+                                    <th style="text-align: center;">الوصف</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminUsersTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="online-badge">
+        <div class="dot"></div>
+        <span id="onlineCountText" class="en-num" style="direction:rtl; font-family:'Almarai', sans-serif;">جارٍ جلب المتصلين...</span>
+    </div>
+
+    <div class="modal-overlay" id="onlineModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <button class="close-btn" onclick="closeModal('onlineModal')">&times;</button>
+            <h2 style="color: var(--secondary-light); margin-bottom: 20px;"><i class="fas fa-users"></i> المتصلون الآن</h2>
+            <div id="allOnlineList" style="max-height: 300px; overflow-y: auto; display:flex; flex-direction:column; gap:10px; font-weight:bold; color:white;"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('loginModal')">&times;</button>
+            <h2 style="color: var(--secondary-light); margin-bottom: 20px;">تسجيل الدخول</h2>
+            <div class="form-group"><label>رقم الجوال</label><input type="tel" id="loginPhone" class="form-control en-num" style="direction:ltr; text-align:left;"></div>
+            <div class="form-group"><label>كلمة المرور</label><input type="password" id="loginPassword" class="form-control"></div>
+            <div class="form-group" style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+                <input type="checkbox" id="loginRemember" style="width:20px; height:20px; cursor:pointer;">
+                <label style="margin:0; font-size:1rem; cursor:pointer;" for="loginRemember">تذكر بيانات الدخول</label>
+            </div>
+            <button class="btn btn-gold w-full" onclick="login()">دخول</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="registerModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('registerModal')">&times;</button>
+            <h2 style="color: var(--secondary-light); margin-bottom: 20px;">عضوية جديدة</h2>
+            <div class="form-group"><label>* اسمك الأول</label><input type="text" id="regFirstName" class="form-control"></div>
+            <div class="form-group"><label>* رقم جوالك</label><input type="tel" id="regPhone" class="form-control en-num" style="direction:ltr; text-align:left;"></div>
+            <div class="form-group"><label>* الاسم المستعار (الكنية)</label><input type="text" id="regNickname" class="form-control"></div>
+            <div class="form-group"><label>* كلمة المرور</label><input type="password" id="regPassword" class="form-control"></div>
+            <div class="form-group"><label>* وصف قصير عنك</label><input type="text" id="regBio" class="form-control"></div>
+            <div class="form-group"><label>صورة الحساب الشخصي (اختياري)</label><input type="file" id="regAvatar" accept="image/*" class="form-control"></div>
+            <button class="btn btn-gold w-full" onclick="register()">إنشاء حساب</button>
+         </div>
+    </div>
+
+    <div class="modal-overlay" id="broadcastModal">
+        <div class="modal-content" style="border-color: var(--accent);">
+            <h2 style="color: var(--accent); margin-bottom: 20px;"><i class="fas fa-envelope"></i> رسالة من الإدارة</h2>
+            <div id="broadcastMsgText" style="margin-bottom:20px; line-height:1.6; max-height:40vh; overflow-y:auto; padding:10px; background:rgba(0,0,0,0.3); border-radius:8px;"></div>
+            <div id="broadcastActions"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="broadcastDetailsModal">
+        <div class="modal-content" style="max-width:600px;">
+            <button class="close-btn" onclick="closeModal('broadcastDetailsModal')">&times;</button>
+            <h2 style="color: var(--secondary-light); margin-bottom: 20px;"><i class="fas fa-list"></i> تفاصيل قراءة الرسالة</h2>
+            <div id="broadcastDetailsList" style="max-height: 60vh; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="userProfileModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('userProfileModal')">&times;</button>
+            <div id="userProfileDetails"></div>
+        </div>
+    </div>
+
+    <script>
+        const GROUPS_DATA = {
+            'الأولى': ['المكسيك', 'جنوب أفريقيا', 'كوريا الجنوبية', 'التشيك'], 'الثانية': ['كندا', 'البوسنة', 'قطر', 'سويسرا'],
+            'الثالثة': ['البرازيل', 'المغرب', 'هايتي', 'اسكتلندا'], 'الرابعة': ['أمريكا', 'أستراليا', 'باراغواي', 'تركيا'],
+            'الخامسة': ['ألمانيا', 'كوراساو', 'ساحل العاج', 'الإكوادور'], 'السادسة': ['هولندا', 'اليابان', 'السويد', 'تونس'],
+            'السابعة': ['بلجيكا', 'مصر', 'إيران', 'نيوزيلندا'], 'الثامنة': ['إسبانيا', 'السعودية', 'أوروغواي', 'الرأس الأخضر'],
+            'التاسعة': ['فرنسا', 'السنغال', 'العراق', 'النرويج'], 'العاشرة': ['الأرجنتين', 'الجزائر', 'النمسا', 'الأردن'],
+            'الحادية عشرة': ['البرتغال', 'كولومبيا', 'أوزبكستان', 'الكونغو'], 'الثانية عشرة': ['إنجلترا', 'كرواتيا', 'غانا', 'بنما']
+        };
+        const FLAGS = {
+            'المكسيك': '🇲🇽', 'جنوب أفريقيا': '🇿🇦', 'كوريا الجنوبية': '🇰🇷', 'التشيك': '🇨🇿',
+            'كندا': '🇨🇦', 'البوسنة': '🇧🇦', 'قطر': '🇶🇦', 'سويسرا': '🇨🇭',
+            'البرازيل': '🇧🇷', 'المغرب': '🇲🇦', 'هايتي': '🇭🇹', 'اسكتلندا': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+            'أمريكا': '🇺🇸', 'أستراليا': '🇦🇺', 'باراغواي': '🇵🇾', 'تركيا': '🇹🇷',
+            'ألمانيا': '🇩🇪', 'كوراساو': '🇨🇼', 'ساحل العاج': '🇨🇮', 'الإكوادور': '🇪🇨',
+            'هولندا': '🇳🇱', 'اليابان': '🇯🇵', 'السويد': '🇸🇪', 'تونس': '🇹🇳',
+            'بلجيكا': '🇧🇪', 'مصر': '🇪🇬', 'إيران': '🇮🇷', 'نيوزيلندا': '🇳🇿',
+            'إسبانيا': '🇪🇸', 'السعودية': '🇸🇦', 'أوروغواي': '🇺🇾', 'الرأس الأخضر': '🇨🇻',
+            'فرنسا': '🇫🇷', 'السنغال': '🇸🇳', 'العراق': '🇮🇶', 'النرويج': '🇳🇴',
+            'الأرجنتين': '🇦🇷', 'الجزائر': '🇩🇿', 'النمسا': '🇦🇹', 'الأردن': '🇯🇴',
+            'البرتغال': '🇵🇹', 'كولومبيا': '🇨🇴', 'أوزبكستان': '🇺🇿', 'الكونغو': '🇨🇩',
+            'إنجلترا': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'كرواتيا': '🇭🇷', 'غانا': '🇬🇭', 'بنما': '🇵🇦'
+        };
+        function getFlag(team) { return FLAGS[team] || '🏳️'; }
+
+        // مصفوفة المدن الـ 15 لتشغيل الساعات بالتناوب
+        const FIFTEEN_CITIES = [
+            { name: 'الرياض', zone: 'Asia/Riyadh' }, { name: 'طوكيو', zone: 'Asia/Tokyo' }, { name: 'أبوظبي', zone: 'Asia/Dubai' },
+            { name: 'لندن', zone: 'Europe/London' }, { name: 'سيدني', zone: 'Australia/Sydney' }, { name: 'باريس', zone: 'Europe/Paris' },
+            { name: 'مكسيكو', zone: 'America/Mexico_City' }, { name: 'طهران', zone: 'Asia/Tehran' }, { name: 'واشنطن', zone: 'America/New_York' },
+            { name: 'موسكو', zone: 'Europe/Moscow' }, { name: 'بيونيس آيرس', zone: 'America/Argentina/Buenos_Aires' }, { name: 'الرباط', zone: 'Africa/Casablanca' },
+            { name: 'بكين', zone: 'Asia/Shanghai' }, { name: 'غرينتش', zone: 'UTC' }, { name: 'الدوحة', zone: 'Asia/Qatar' }
+        ];
+
+        let users = JSON.parse(localStorage.getItem('wc26_users_v6')) || [];
+        let currentUser = JSON.parse(localStorage.getItem('wc26_current_user_v6')) || null;
+        let matches = JSON.parse(localStorage.getItem('wc26_matches_v6')) || [];
+        let predictions = JSON.parse(localStorage.getItem('wc26_predictions_v6')) || {};
+        let news = JSON.parse(localStorage.getItem('wc26_news_v6')) || ["أهلاً بكم في مونديال التوقعات 2026"];
+        let dailyQuestions = JSON.parse(localStorage.getItem('wc26_questions_v9')) || [];
+        let adsList = JSON.parse(localStorage.getItem('wc26_ads_v7')) || [];
+        let broadcasts = JSON.parse(localStorage.getItem('wc26_broadcasts_v6')) || [];
+        
+        window.currentOnlineList = [];
+        let currentClockPage = 0;
+        let clockInterval = null;
+
+        users.forEach(u => { if(!u.registeredAt) u.registeredAt = 0; });
+        document.addEventListener('DOMContentLoaded', () => {
+            initUI();
+            if(currentUser) {
+                let onlineUsers = JSON.parse(localStorage.getItem('wc26_online_users') || '{}');
+                onlineUsers[currentUser.nickname] = { tab: currentUser.activeTab || 'الشروط', time: Date.now() };
+                localStorage.setItem('wc26_online_users', JSON.stringify(onlineUsers));
+            }
+            checkOnlineUsers();
+            setInterval(updateMainCountdown, 1000);
+            setInterval(updateMatchTimers, 1000); 
+            setInterval(checkOnlineUsers, 5000);
+        });
+
+        function initUI() {
+            updateUserNav(); renderNews(); populateTeamSelects(); renderGroups(); renderMatches(); renderLeaderboard();
+            renderDailyTab(); setTimeout(checkBroadcast, 1000); renderAds();
+            if(currentUser && currentUser.isAdmin) {
+                document.getElementById('adminPanel').classList.remove('hidden');
+                populateAdminMatchSelect(); renderAdminAdsList(); renderAdminBroadcastHistory(); renderAdminUsers();
+            }
+        }
+
+        function startWorldClocks() {
+            const banner = document.getElementById('worldClocksBanner');
+            if (banner.style.display !== 'block') {
+                banner.style.display = 'block';
+                if(!clockInterval) {
+                    renderClocksPage();
+                    clockInterval = setInterval(() => {
+                        currentClockPage = (currentClockPage + 1) % 3;
+                        renderClocksPage();
+                    }, 5000);
+                    setInterval(renderClocksPage, 1000);
+                }
+            }
+        }
+
+        function renderClocksPage() {
+            const grid = document.getElementById('clocksGrid');
+            const startIndex = currentClockPage * 5;
+            const chunk = FIFTEEN_CITIES.slice(startIndex, startIndex + 5);
+            const now = new Date();
+            grid.innerHTML = chunk.map(city => {
+                const timeString = now.toLocaleTimeString('en-US', { timeZone: city.zone, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+                return `<div class="clock-widget"><div class="clock-widget-city">${city.name}</div><div class="clock-widget-time en-num">${timeString}</div></div>`;
+            }).join('');
+        }
+
+        function updateMainCountdown() {
+            const target = new Date('2026-06-11T00:00:00').getTime();
+            const now = new Date().getTime();
+            const diff = target - now;
+            if(diff <= 0) { 
+                document.getElementById('mainCountdown').innerText = 'بدأت البطولة!'; 
+                startWorldClocks();
+                return; 
+            }
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24)), h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)), m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)), s = Math.floor((diff % (1000 * 60)) / 1000);
+            document.getElementById('mainCountdown').innerHTML = `<div style="display:flex; gap:15px; justify-content:center; direction: ltr;"><div style="display:flex; flex-direction:column; align-items:center;"><span class="en-num" style="font-size:1.3rem;">${d}</span><span style="font-size:0.75rem; color:var(--secondary-light);">يوم</span></div><div style="display:flex; flex-direction:column; align-items:center;"><span class="en-num" style="font-size:1.3rem;">${h}</span><span style="font-size:0.75rem; color:var(--secondary-light);">ساعة</span></div><div style="display:flex; flex-direction:column; align-items:center;"><span class="en-num" style="font-size:1.3rem;">${m}</span><span style="font-size:0.75rem; color:var(--secondary-light);">دقيقة</span></div><div style="display:flex; flex-direction:column; align-items:center;"><span class="en-num" style="font-size:1.3rem;">${s}</span><span style="font-size:0.75rem; color:var(--secondary-light);">ثانية</span></div></div>`;
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            const btn = document.querySelector(`button[onclick="switchTab('${tabId}')"]`);
+            if(btn) btn.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+            if(currentUser) {
+                let tabNames = {'rulesTab': 'الشروط', 'matchesTab': 'المباريات', 'groupsTab': 'المجموعات', 'dailyTab': 'السؤال اليومي', 'leaderboardTab': 'الصدارة'};
+                currentUser.activeTab = tabNames[tabId];
+                localStorage.setItem('wc26_current_user_v6', JSON.stringify(currentUser));
+                let onlineUsers = JSON.parse(localStorage.getItem('wc26_online_users') || '{}');
+                onlineUsers[currentUser.nickname] = { tab: currentUser.activeTab, time: Date.now() };
+                localStorage.setItem('wc26_online_users', JSON.stringify(onlineUsers));
+                checkOnlineUsers();
+            }
+        }
+
+        function populateTeamSelects() {
+            let options = '<option value="">اختر المنتخب</option>';
+            Object.values(GROUPS_DATA).flat().forEach(team => { options += `<option value="${team}">${team}</option>`; });
+            document.getElementById('adminNewMatchTeam1').innerHTML = options;
+            document.getElementById('adminNewMatchTeam2').innerHTML = options;
+        }
+
+        function adminAddNewMatch() {
+            const t1 = document.getElementById('adminNewMatchTeam1').value;
+            const t2 = document.getElementById('adminNewMatchTeam2').value;
+            const dateStr = document.getElementById('adminNewMatchDate').value;
+            const stage = document.getElementById('adminNewMatchStage').value;
+            if(!t1 || !t2 || !dateStr) { alert('يرجى تعبئة جميع الحقول وتحديد التاريخ'); return; }
+            if(t1 === t2) { alert('لا يمكن اختيار نفس المنتخب مرتين'); return; }
+            let group1 = null; let group2 = null;
+            for(let g in GROUPS_DATA) { if(GROUPS_DATA[g].includes(t1)) group1 = g; if(GROUPS_DATA[g].includes(t2)) group2 = g; }
+            matches.push({
+                id: Date.now(), team1: t1, team2: t2, date: new Date(dateStr).toISOString(),
+                played: false, score1: null, score2: null,
+                group: (group1 === group2 && group1 !== null && stage === 'المجموعات') ? group1 : 'إقصائية',
+                stage: stage
+            });
+            localStorage.setItem('wc26_matches_v6', JSON.stringify(matches));
+            alert('تمت إضافة المباراة بنجاح.'); location.reload();
+        }
+
+        function renderMatches() {
+            const upcomingContainer = document.getElementById('upcomingMatches');
+            const pastContainer = document.getElementById('pastMatches');
+            upcomingContainer.innerHTML = ''; pastContainer.innerHTML = '';
+            const upcM = matches.filter(m => !m.played).sort((a,b) => new Date(a.date) - new Date(b.date));
+            const pstM = matches.filter(m => m.played).sort((a,b) => new Date(b.date) - new Date(a.date));
+            if(upcM.length === 0) upcomingContainer.innerHTML = '<div style="text-align:center; color:var(--text-muted);">لا توجد مباريات مدرجة حالياً.</div>';
+            if(pstM.length === 0) pastContainer.innerHTML = '<div style="text-align:center; color:var(--text-muted);">لا توجد مباريات سابقة.</div>';
+            
+            const buildMatchHTML = (m) => {
+                const mDate = new Date(m.date);
+                const mTime = mDate.getTime();
+                const isStarted = mTime <= Date.now();
+                const userPred = (currentUser && predictions[m.id]) ? predictions[m.id][currentUser.nickname] : null;
+                
+                let allPredictionsHtml = '';
+                if (isStarted || m.played) {
+                    let preds = predictions[m.id];
+                    if (preds && Object.keys(preds).length > 0) {
+                        let predCards = Object.keys(preds).map(username => {
+                            let p = preds[username];
+                            let userObj = users.find(u => u.nickname === username);
+                            let nameColor = (userObj && userObj.isAdmin) ? '#e11d48' : 'var(--text)';
+                            return `<div style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:8px; text-align:center;">
+                                <div style="font-size:0.85rem; font-weight:bold; color:${nameColor}; margin-bottom:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${username}</div>
+                                <div style="display:flex; justify-content:center; align-items:center; gap:5px; direction:rtl; font-weight:bold; background:rgba(0,0,0,0.5); border-radius:4px; padding:2px 5px;">
+                                    <span class="en-num" style="color:var(--accent);">${p.s1}</span>
+                                    <span style="color:white;">-</span>
+                                    <span class="en-num" style="color:var(--accent);">${p.s2}</span>
+                                </div>
+                                ${p.joker ? '<div style="font-size:0.7rem; color:var(--secondary-light); margin-top:3px;">🃏 استخدم الجوكر</div>' : ''}
+                            </div>`;
+                        }).join('');
+                        
+                        allPredictionsHtml = `
+                        <div style="margin-top: 20px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 15px;">
+                            <h5 style="color:var(--secondary-light); margin-bottom:10px;"><i class="fas fa-eye"></i> توقعات جميع المتسابقين لهذه المباراة:</h5>
+                            <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap:10px;">
+                                ${predCards}
+                            </div>
+                        </div>`;
+                    } else {
+                        allPredictionsHtml = `
+                        <div style="margin-top: 20px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 15px;">
+                            <h5 style="color:var(--secondary-light); margin-bottom:10px;"><i class="fas fa-eye"></i> توقعات المتسابقين:</h5>
+                            <div style="color:var(--text-muted); font-size:0.9rem; text-align:center;">لم يقم أحد بإرسال توقعات لهذه المباراة.</div>
+                        </div>`;
+                    }
+                }
+
+                let html = `<div class="match-card" id="match-card-${m.id}">
+                        <div class="match-header">
+                            <span style="color:var(--secondary-light); font-weight:800;">${m.group !== 'إقصائية' ? `المجموعة ${m.group}` : m.stage}</span>
+                            <div style="text-align:left;">
+                                <span class="en-num" style="font-size:0.9rem">${mDate.toLocaleDateString('en-US')} ${mDate.toLocaleTimeString('en-US',{hour:'2-digit', minute:'2-digit'})}</span>
+                                ${!m.played ? `<br><span id="timer-${m.id}" class="match-timer en-num">جاري الحساب...</span>` : ''}
+                            </div>
+                        </div>`;
+                if(!m.played) {
+                    if (userPred) {
+                        html += `
+                        <div style="background:rgba(255,255,255,0.03); padding:15px; border-radius:8px; text-align:center; border: 1px solid rgba(255,255,255,0.05);">
+                            <h4 style="color:var(--secondary-light); margin-bottom:15px;"><i class="fas fa-check-circle"></i> تم حفظ توقعك لهذه المباراة</h4>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div style="flex:1; text-align:right; font-size:1.3rem; font-weight:800; display:flex; align-items:center; gap:8px;">${getFlag(m.team1)} <span>${m.team1}</span></div>
+                                <div style="display:flex; align-items:center; gap:10px; direction:rtl; background:rgba(0,0,0,0.4); padding:10px 20px; border-radius:12px; border:1px solid var(--accent);">
+                                    <span class="en-num" style="color:var(--accent); font-size:1.5rem; font-weight:bold;">${userPred.s1}</span>
+                                    <span style="color:white; font-size:1.5rem;">-</span>
+                                    <span class="en-num" style="color:var(--accent); font-size:1.5rem; font-weight:bold;">${userPred.s2}</span>
+                                </div>
+                                <div style="flex:1; text-align:left; font-size:1.3rem; font-weight:800; display:flex; align-items:center; justify-content:flex-end; gap:8px;"><span>${m.team2}</span> ${getFlag(m.team2)}</div>
+                            </div>
+                            ${userPred.joker ? '<div style="margin-top:10px; color:var(--secondary-light); font-weight:bold;"><i class="fas fa-star"></i> تم تفعيل بطاقة الجوكر 🃏</div>' : ''}
+                        </div>`;
+                    } else {
+                        const s1 = ''; const s2 = ''; const jActive = '';
+                        const allowedJokerStages = ['المجموعات', 'دور الـ32', 'دور الـ16'];
+                        const showJoker = allowedJokerStages.includes(m.stage);
+                        html += `
+                        <div style="background:rgba(255,255,255,0.03); padding:15px; border-radius:8px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div style="flex:1; text-align:right; font-size:1.3rem; font-weight:800; display:flex; align-items:center; gap:8px;">${getFlag(m.team1)} <span>${m.team1}</span></div>
+                                <div style="display:flex; align-items:center; gap:10px; direction:rtl;">
+                                    <input type="number" id="pred_${m.id}_1" class="score-input en-num" value="${s1}" min="0">
+                                    <span style="color:var(--accent); font-weight:bold; font-size:1.2rem;">-</span>
+                                    <input type="number" id="pred_${m.id}_2" class="score-input en-num" value="${s2}" min="0">
+                                </div>
+                                <div style="flex:1; text-align:left; font-size:1.3rem; font-weight:800; display:flex; align-items:center; justify-content:flex-end; gap:8px;"><span>${m.team2}</span> ${getFlag(m.team2)}</div>
+                            </div>
+                            ${currentUser ? `
+                            <div class="prediction-controls mt-10" id="pred-area-${m.id}" style="display: flex; justify-content: center; align-items: center; gap: 15px; flex-wrap: wrap;">
+                                ${showJoker ? `<button class="joker-btn ${jActive}" onclick="toggleJoker(${m.id}, this)">🃏 تفعيل الجوكر</button>` : ''}
+                                <button class="btn btn-primary" onclick="savePrediction(${m.id}, this)">حفظ التوقع</button>
+                            </div>` : `<div style="text-align:center; margin-top:15px; color:var(--text-muted); font-weight:bold;">سجل دخول لتتوقع النتيجة</div>`}
+                        </div>`;
+                    }
+                } else {
+                    html += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 1.4rem; font-weight: 800; margin-bottom: 20px;">
+                            <div style="flex:1; text-align:right;">${getFlag(m.team1)} ${m.team1}</div>
+                            <div style="padding:0 20px; display:flex; gap:10px; direction:rtl; justify-content:center;">
+                                <span class="en-num" style="color:var(--accent);">${m.score1}</span>
+                                <span style="color:var(--text);">-</span>
+                                <span class="en-num" style="color:var(--accent);">${m.score2}</span>
+                            </div>
+                            <div style="flex:1; text-align:left;">${m.team2} ${getFlag(m.team2)}</div>
+                        </div>`;
+                        
+                    if(userPred) {
+                        html += `<div style="text-align:center; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
+                            <span style="color:var(--secondary-light)">توقعك كان: <div style="display:inline-flex; align-items:center; gap:5px; direction:rtl; margin:0 10px;"><span class="en-num">${userPred.s1}</span> <span style="color:var(--text);">-</span> <span class="en-num">${userPred.s2}</span></div> ${userPred.joker ? '<span style="color:var(--accent);">(باستخدام الجوكر 🃏)</span>' : ''}</span>
+                        </div>`;
+                    } else if(currentUser) { 
+                        html += `<div style="text-align:center; color:var(--text-muted)">لم تقم بوضع توقع.</div>`; 
+                    }
+                }
+                html += allPredictionsHtml;
+                html += `</div>`;
+                return html;
+            };
+
+            upcM.forEach(m => upcomingContainer.innerHTML += buildMatchHTML(m));
+            pstM.forEach(m => pastContainer.innerHTML += buildMatchHTML(m));
+        }
+
+        function updateMatchTimers() {
+            const now = new Date().getTime();
+            matches.forEach(m => {
+                if(!m.played) {
+                    const timerEl = document.getElementById(`timer-${m.id}`);
+                    const predArea = document.getElementById(`pred-area-${m.id}`);
+                    if(timerEl) {
+                        const mTime = new Date(m.date).getTime();
+                        const diff = mTime - now;
+                        if(diff > 0) {
+                            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            const min = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                            const s = Math.floor((diff % (1000 * 60)) / 1000);
+                            timerEl.innerText = `${d}d ${h}h ${min}m ${s}s`;
+                        } else {
+                            timerEl.innerText = 'STARTED';
+                            timerEl.style.backgroundColor = '#e11d48'; timerEl.style.color = 'white';
+                            if(predArea && !predArea.classList.contains('locked')) {
+                                predArea.innerHTML = '<div style="color:#e11d48; font-weight:800; font-size:1.1rem;"><i class="fas fa-lock"></i> أُغلقت التوقعات (المباراة بدأت)</div>';
+                                predArea.classList.add('locked');
+                                renderMatches(); // إعادة الرندرة لإظهار توقعات الجميع عند بداية المباراة
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function toggleJoker(matchId, btn) {
+            const m = matches.find(x => x.id === matchId);
+            const isCurrentlyActive = btn.classList.contains('active');
+
+            if (!isCurrentlyActive) {
+                let stageUses = 0; let allowed = 0;
+                if (m.stage === 'المجموعات') allowed = 3;
+                else if (m.stage === 'دور الـ32') allowed = 1;
+                else if (m.stage === 'دور الـ16') allowed = 1;
+
+                if(allowed === 0) { alert('غير مسموح باستخدام الجوكر في هذا الدور.'); return; }
+
+                for (const pid in predictions) {
+                    if(pid == matchId) continue;
+                    const pMatch = matches.find(x => x.id == pid);
+                    if (pMatch && pMatch.stage === m.stage && predictions[pid][currentUser.nickname] && predictions[pid][currentUser.nickname].joker) {
+                        stageUses++;
+                    }
+                }
+
+                if (stageUses >= allowed) {
+                    alert(`لقد استنفدت الحد الأقصى لاستخدام الجوكر في ${m.stage} (${allowed} مرات).`);
+                    return;
+                }
+            }
+            btn.classList.toggle('active');
+        }
+
+        function savePrediction(matchId, btn) {
+            if(predictions[matchId] && predictions[matchId][currentUser.nickname]) {
+                alert('لقد قمت بإرسال التوقع لهذه المباراة مسبقاً ولا يمكنك إرساله مرتين.'); return;
+            }
+            const s1 = document.getElementById(`pred_${matchId}_1`).value;
+            const s2 = document.getElementById(`pred_${matchId}_2`).value;
+            const jokerBtn = document.querySelector(`#pred_${matchId}_1`).closest('.match-card').querySelector('.joker-btn');
+            const joker = jokerBtn ? jokerBtn.classList.contains('active') : false;
+            if(s1==='' || s2==='') { alert('يرجى إدخال النتيجة للطرفين'); return; }
+            
+            btn.disabled = true;
+            if(!predictions[matchId]) predictions[matchId] = {};
+            predictions[matchId][currentUser.nickname] = { s1: parseInt(s1), s2: parseInt(s2), joker: joker };
+            localStorage.setItem('wc26_predictions_v6', JSON.stringify(predictions)); 
+            alert('تم حفظ التوقع بنجاح!');
+            renderMatches();
+        }
+
+        function renderGroups() {
+            const grid = document.getElementById('groupsGrid');
+            grid.innerHTML = '';
+            Object.entries(GROUPS_DATA).forEach(([gName, teams]) => {
+                let stats = {};
+                teams.forEach(t => stats[t] = {pts:0, pld:0, w:0, d:0, l:0, gf:0, ga:0, gd:0});
+                matches.filter(m => m.group === gName && m.played).forEach(m => {
+                    const [t1, t2] = [m.team1, m.team2];
+                    const [s1, s2] = [m.score1, m.score2];
+                    if(!stats[t1]) return; 
+                    stats[t1].pld++; stats[t2].pld++; stats[t1].gf += s1; stats[t1].ga += s2; stats[t2].gf += s2; stats[t2].ga += s1;
+                    if(s1 > s2) { stats[t1].w++; stats[t1].pts += 3; stats[t2].l++; }
+                    else if(s1 < s2) { stats[t2].w++; stats[t2].pts += 3; stats[t1].l++; }
+                    else { stats[t1].d++; stats[t2].d++; stats[t1].pts++; stats[t2].pts++; }
+                });
+                teams.forEach(t => stats[t].gd = stats[t].gf - stats[t].ga);
+                const sorted = teams.sort((a,b) => {
+                    if(stats[b].pts !== stats[a].pts) return stats[b].pts - stats[a].pts;
+                    if(stats[b].gd !== stats[a].gd) return stats[b].gd - stats[a].gd;
+                    return stats[b].gf - stats[a].gf;
+                });
+                let html = `<div class="group-card"><div class="group-header">المجموعة ${gName}</div>
+                                <div class="team-row" style="background: rgba(255,255,255,0.05); font-size: 0.75rem; color: var(--secondary-light); font-weight: 800; border-radius: 6px 6px 0 0; padding: 8px 10px;">
+                                    <div class="team-name-col" style="font-size: 0.8rem;">المنتخب</div>
+                                    <div class="team-stats">
+                                        <div class="stat-col">لعب</div><div class="stat-col">فاز</div><div class="stat-col">تعادل</div>
+                                        <div class="stat-col">خسر</div><div class="stat-col">له</div><div class="stat-col">عليه</div>
+                                        <div class="stat-col">النقاط</div>
+                                    </div>
+                                </div>`;
+                sorted.forEach((t, i) => {
+                    const s = stats[t]; const cls = (i < 2) ? 'qualifier' : '';
+                    html += `<div class="team-row ${cls}">
+                            <div class="team-name-col"><span class="en-num">${i+1}.</span> ${getFlag(t)} ${t}</div>
+                            <div class="team-stats">
+                                <div class="stat-col en-num">${s.pld}</div><div class="stat-col en-num">${s.w}</div><div class="stat-col en-num">${s.d}</div>
+                                <div class="stat-col en-num">${s.l}</div><div class="stat-col en-num">${s.gf}</div><div class="stat-col en-num">${s.ga}</div>
+                                <div class="stat-col en-num" style="color:var(--secondary-light)">${s.pts}</div>
+                            </div>
+                        </div>`;
+                });
+                html += `</div>`; grid.innerHTML += html;
+            });
+        }
+
+        function adminForceArchive(qId) {
+            if(confirm('هل أنت متأكد من أرشفة هذا السؤال ونقله للأرشيف فوراً؟')) {
+                const q = dailyQuestions.find(x => x.id === qId);
+                if(q) {
+                    q.forceArchive = true;
+                    localStorage.setItem('wc26_questions_v9', JSON.stringify(dailyQuestions));
+                    location.reload();
+                }
+            }
+        }
+
+        function renderDailyTab() {
+            const activeArea = document.getElementById('activeQuestionArea');
+            const archiveArea = document.getElementById('archiveQuestionsArea');
+            if(!activeArea || !archiveArea) return;
+            
+            activeArea.innerHTML = ''; archiveArea.innerHTML = '';
+            let hasActive = false;
+            let reversedQs = [...dailyQuestions].reverse();
+
+            reversedQs.forEach(q => {
+                const pTime = q.publishTime || q.id;
+                const isPublished = Date.now() >= pTime;
+                
+                // إخفاء الأسئلة المجدولة مستقبلاً عن المتسابقين العاديين
+                if (!isPublished && (!currentUser || !currentUser.isAdmin)) return;
+                
+                let scheduledBadge = (!isPublished && currentUser && currentUser.isAdmin) ? `<span style="background:var(--secondary); color:var(--dark); padding:3px 10px; border-radius:6px; font-size:0.8rem; margin-left:10px; font-weight:bold;">⏳ مجدول للنشر: <span class="en-num" style="direction:rtl;">${new Date(pTime).toLocaleString('ar-SA')}</span></span>` : '';
+
+                const qDate = new Date(pTime);
+                let archiveTime = new Date(qDate);
+                if (qDate.getHours() < 12) {
+                    archiveTime.setHours(12, 0, 0, 0);
+                } else {
+                    archiveTime.setDate(archiveTime.getDate() + 1);
+                    archiveTime.setHours(12, 0, 0, 0);
+                }
+                
+                const isArchived = q.forceArchive || (Date.now() >= archiveTime.getTime());
+                
+                let sortedAnswers = [...q.answers].sort((a,b) => a.time - b.time);
+                let ansHtml = sortedAnswers.map(a => {
+                    let timeStr = new Date(a.time).toLocaleTimeString('en-US', {hour12: false});
+                    let ansUser = users.find(u => u.nickname === a.user);
+                    let nameColor = (ansUser && ansUser.isAdmin) ? '#e11d48' : 'var(--text)';
+                    
+                    // تلوين إطار الإجابة (أخضر للصحيح، أحمر للخاطئ)
+                    let bgCol = a.correct ? 'rgba(74, 222, 128, 0.15)' : 'rgba(225, 29, 72, 0.15)';
+                    let borderCol = a.correct ? '2px solid #4ade80' : '2px solid #e11d48';
+                    let iconHtml = a.correct ? '<i class="fas fa-check" style="color:#4ade80;"></i>' : '<i class="fas fa-times" style="color:#e11d48;"></i>';
+
+                    return `<div style="background:${bgCol}; border:${borderCol}; padding:10px; margin-bottom:10px; border-radius:8px; font-size:1rem; display:flex; justify-content:space-between; align-items:center;">
+                        <div><strong style="color:${nameColor};">${a.user}:</strong> <span style="margin-right:5px; color:var(--text);">${a.text}</span></div>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span class="en-num" style="color:var(--text); font-size:0.9rem; background:rgba(0,0,0,0.5); padding:2px 8px; border-radius:4px;">${timeStr}</span> 
+                            ${iconHtml}
+                        </div>
+                    </div>`;
+                }).join('');
+
+                if(!isArchived && !hasActive && isPublished) {
+                    hasActive = true;
+                    let userAns = q.answers.find(a => currentUser && a.user === currentUser.nickname);
+                    let inputHtml = '';
+                    
+                    const regTime = currentUser ? (currentUser.registeredAt || 0) : 0;
+                    const canAnswerTime = pTime >= regTime;
+                    if (currentUser && !currentUser.isAdmin && !userAns) {
+                        if (canAnswerTime) {
+                            inputHtml = `
+                                <div style="margin-top:20px; padding:20px; border:2px solid var(--secondary); border-radius:12px; background:rgba(0,0,0,0.05); display:flex; flex-direction:column; align-items:center;">
+                                    <label style="color:var(--secondary-light); font-weight:bold; margin-bottom:10px; font-size:1.1rem;">📝 أجب هنا:</label>
+                                    <input type="text" id="dqAnswer_${q.id}" class="q-input" placeholder="اكتب إجابتك هنا بوضوح..." style="margin-bottom:15px; width:100%; max-width:500px;">
+                                    <button class="btn btn-gold w-full" style="max-width:500px; padding:15px; font-size:1.2rem;" onclick="submitDailyAnswer(${q.id}, this)">إرسال الإجابة الآن</button>
+                                </div>
+                            `;
+                        } else {
+                            inputHtml = `<div style="margin-top:20px; padding:15px; text-align:center; background:rgba(225,29,72,0.1); border:1px solid #e11d48; border-radius:8px; color:white; font-weight:bold;">عذراً، تم طرح هذا السؤال قبل تسجيلك في الموقع ولا يمكنك المشاركة فيه. ستتمكن من المشاركة ابتداءً من الأسئلة القادمة.</div>`;
+                        }
+                    }
+                    
+                    let viewAnsHtml = '';
+                    if (currentUser && (currentUser.isAdmin || userAns)) {
+                        viewAnsHtml = `<div class="mt-10" style="text-align: right; background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px;">
+                            <h4 style="color: var(--secondary-light); margin-bottom: 10px;">إجابات المتسابقين بالترتيب الزمني:</h4>
+                            ${ansHtml || '<div style="color:var(--text-muted); font-size:0.9rem;">لا توجد إجابات بعد.</div>'}
+                        </div>`;
+                        if (currentUser.isAdmin) {
+                            viewAnsHtml = `<div style="color:var(--accent); margin-bottom:10px; font-weight:bold; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">نماذج الإجابة الصحيحة المقبولة: ${q.answersList.join(' ، ')}</div>` + viewAnsHtml;
+                            viewAnsHtml += `<div style="text-align:center; margin-top:15px;"><button class="btn btn-danger" onclick="adminForceArchive(${q.id})"><i class="fas fa-archive"></i> أرشفة السؤال فوراً</button></div>`;
+                        }
+                    } else if (currentUser && !userAns && canAnswerTime) {
+                        viewAnsHtml = `<div style="margin-top:15px; color:var(--text-muted); font-size:0.9rem;">لن تظهر إجابات المتسابقين الآخرين وتسلسلها إلا بعد إرسال إجابتك.</div>`;
+                    } else if (!currentUser) {
+                        viewAnsHtml = `<div style="margin-top:15px; color:var(--text-muted); font-weight:bold;">سجل دخول لتتمكن من المشاركة.</div>`;
+                    }
+
+                    activeArea.innerHTML = `
+                        <div style="background:rgba(0,0,0,0.2); padding:20px; border-radius:12px; border:1px solid rgba(255,255,255,0.1);">
+                            <div class="q-text" style="color:var(--text); font-size:1.6rem; margin-bottom:10px;">السؤال رقم (${q.qNum}): <span style="color:var(--secondary-light);">${q.text}</span></div>
+                            ${inputHtml}
+                            ${viewAnsHtml}
+                        </div>
+                    `;
+                } else {
+                    archiveArea.innerHTML += `
+                        <div style="background:rgba(0,0,0,0.05); padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid rgba(255,255,255,0.05); text-align:right;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:10px;">
+                                <h4 style="color:var(--secondary-light); margin:0;">السؤال رقم (${q.qNum}): ${q.text}</h4>
+                                ${scheduledBadge}
+                            </div>
+                            ${currentUser && currentUser.isAdmin ? `<div style="color:var(--accent); margin-bottom:10px; font-weight:bold;">نماذج الإجابة الصحيحة المقبولة: ${q.answersList.join(' ، ')}</div>` : ''}
+                            <h5 style="color:var(--text); margin-bottom:5px;">سجل الإجابات:</h5>
+                            <div style="max-height:300px; overflow-y:auto; padding-left:10px; border-right:2px solid rgba(255,255,255,0.1); margin-right:5px; padding-top:10px;">
+                                ${ansHtml || '<div style="color:var(--text-muted); font-size:0.8rem;">لا توجد إجابات.</div>'}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            if (!hasActive) {
+                activeArea.innerHTML = `<div class="q-text" style="color:var(--text-muted);">في انتظار طرح سؤال جديد...</div>`;
+            }
+        }
+
+        function submitDailyAnswer(qId, btn) {
+            const q = dailyQuestions.find(x => x.id === qId);
+            if(q.answers.some(a => a.user === currentUser.nickname)) {
+                alert('لقد قمت بإرسال إجابة لهذا السؤال مسبقاً ولا يمكنك إرسال إجابة أخرى.');
+                return;
+            }
+
+            const inputVal = document.getElementById(`dqAnswer_${qId}`).value.trim();
+            if(!inputVal) return;
+            btn.disabled = true;
+            const isCorrect = q.answersList.some(ans => ans === inputVal);
+            q.answers.push({
+                user: currentUser.nickname,
+                text: inputVal,
+                time: Date.now(),
+                correct: isCorrect
+            });
+            localStorage.setItem('wc26_questions_v9', JSON.stringify(dailyQuestions));
+            renderDailyTab(); renderLeaderboard();
+        }
+
+        function adminPostQuestion() {
+            const text = document.getElementById('adminQText').value.trim();
+            const publishTimeInput = document.getElementById('adminQPublishTime').value;
+            let publishTime = publishTimeInput ? new Date(publishTimeInput).getTime() : Date.now();
+            
+            let answersList = [];
+            for(let i=1; i<=10; i++) {
+                let v = document.getElementById('adminQAns'+i).value.trim();
+                if(v) answersList.push(v);
+            }
+            if(!text || answersList.length === 0) { alert('يرجى كتابة السؤال ونموذج إجابة صحيح واحد على الأقل'); return; }
+            
+            const qNum = dailyQuestions.length + 1;
+            dailyQuestions.push({
+                id: Date.now(),
+                qNum: qNum,
+                text: text,
+                answersList: answersList,
+                answers: [],
+                forceArchive: false,
+                publishTime: publishTime
+            });
+            
+            localStorage.setItem('wc26_questions_v9', JSON.stringify(dailyQuestions));
+            alert('تم حفظ السؤال بنجاح');
+            location.reload();
+        }
+
+        function calculateUserPoints(username) {
+            let total = 0; let details = [];
+            matches.filter(m => m.played).forEach(m => {
+                if(predictions[m.id] && predictions[m.id][username]) {
+                    const p = predictions[m.id][username];
+                    const m1 = m.score1, m2 = m.score2, p1 = p.s1, p2 = p.s2;
+                    const actualWinner = m1 > m2 ? 1 : (m1 < m2 ? 2 : 0);
+                    const predWinner = p1 > p2 ? 1 : (p1 < p2 ? 2 : 0);
+                    let pts = 0; let desc = '';
+                    if (actualWinner === predWinner) {
+                        if (m1 === p1 && m2 === p2) {
+                            pts = p.joker ? 6 : 3;
+                            desc = `توقع دقيق لنتيجة: <div style="display:inline-flex; align-items:center; gap:5px; direction:rtl; margin:0 5px; font-weight:bold;"><span style="color:var(--secondary-light)">${m.team1}</span><span class="en-num" style="color:var(--accent)">${m1}</span><span style="color:var(--text)">-</span><span class="en-num" style="color:var(--accent)">${m2}</span><span style="color:var(--secondary-light)">${m.team2}</span></div> ${p.joker ? '<span style="color:var(--accent)">(جوكر)</span>' : ''}`;
+                        } else {
+                            pts = p.joker ? 2 : 1; 
+                            desc = `توقع الفائز في مباراة: <div style="display:inline-flex; align-items:center; gap:5px; direction:rtl; margin:0 5px; font-weight:bold;"><span style="color:var(--secondary-light)">${m.team1}</span><span class="en-num" style="color:var(--accent)">${m1}</span><span style="color:var(--text)">-</span><span class="en-num" style="color:var(--accent)">${m2}</span><span style="color:var(--secondary-light)">${m.team2}</span></div> ${p.joker ? '<span style="color:var(--accent)">(جوكر)</span>' : ''}`;
+                        }
+                    }
+                    if(pts > 0) { total += pts; details.push({desc, pts}); }
+                }
+            });
+            dailyQuestions.forEach(q => {
+                const correctAnswers = q.answers.filter(a => a.correct).sort((a,b) => a.time - b.time);
+                const userAnsIndex = correctAnswers.findIndex(a => a.user === username);
+                if(userAnsIndex !== -1) {
+                    let pts = 0;
+                    let descRank = "";
+                    if(userAnsIndex === 0) { pts = 4; descRank = "أسرع إجابة صحيحة"; }
+                    else if(userAnsIndex === 1) { pts = 1; descRank = "ثاني أسرع إجابة صحيحة"; }
+                    else if(userAnsIndex === 2) { pts = 1; descRank = "ثالث أسرع إجابة صحيحة"; }
+                    
+                    if(pts > 0) {
+                        total += pts;
+                        details.push({desc: `إجابة السؤال اليومي رقم (${q.qNum}) (${descRank})`, pts});
+                    }
+                }
+            });
+            return { total, details };
+        }
+
+        function renderLeaderboard() {
+            const tbody = document.getElementById('leaderboardBody');
+            const board = users.map(u => {
+                const res = calculateUserPoints(u.nickname); 
+                return { name: u.nickname, avatar: u.avatar, points: res.total, isAdmin: u.isAdmin, registeredAt: u.registeredAt || 0 };
+            }).sort((a, b) => {
+                if (b.points !== a.points) return b.points - a.points;
+                return a.registeredAt - b.registeredAt;
+            });
+            tbody.innerHTML = board.map((u, i) => {
+                let avatarTag = u.avatar ? `<img src="${u.avatar}" class="user-avatar" style="vertical-align:middle; width:40px; height:40px; margin-left:10px;">` : `<i class="fas fa-user-circle" style="font-size:2.5rem; color:var(--text-muted); vertical-align:middle; margin-left:10px;"></i>`;
+                let nameHtml = u.isAdmin ? `<span style="color:#e11d48;">${u.name} <i class="fas fa-crown" style="font-size:0.8rem;" title="مدير النظام"></i></span>` : u.name;
+                
+                return `<tr>
+                    <td class="en-num">${i+1}</td>
+                    <td style="cursor:pointer; transition:0.3s;" onclick="showUserProfile('${u.name}')" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
+                        ${avatarTag} ${nameHtml}
+                    </td>
+                    <td class="en-num" style="color:var(--secondary-light); font-weight:800;">${u.points}</td>
+                </tr>`;
+            }).join('');
+            if(currentUser) {
+                document.getElementById('userPointsSection').classList.remove('hidden');
+                document.getElementById('userTotalPoints').innerText = board.find(x => x.name === currentUser.nickname)?.points || 0;
+            }
+        }
+
+        function showUserProfile(username) {
+            const user = users.find(u => u.nickname === username);
+            const res = calculateUserPoints(username);
+            const container = document.getElementById('userProfileDetails');
+            
+            let avatarHtml = user.avatar ? `<img src="${user.avatar}" style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:3px solid var(--secondary); margin-bottom:10px;">` : `<i class="fas fa-user-circle" style="font-size:5rem; color:var(--text-muted); margin-bottom:10px; display:block;"></i>`;
+            
+            let regDateStr = (user.registeredAt && user.registeredAt > 0) ? new Date(user.registeredAt).toLocaleString('ar-SA', { timeZone: 'Asia/Riyadh', hour12: true, year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'تاريخ غير متاح';
+            
+            let nameColor = user.isAdmin ? '#e11d48' : 'var(--secondary-light)';
+            let profileHtml = `
+                <div style="text-align:center; margin-bottom:20px;">
+                    ${avatarHtml}
+                    <h2 style="color:${nameColor};">${user.nickname}</h2>
+                    <p style="color:var(--text-muted); font-size:1rem; margin-top:5px; padding: 0 10px;">"${user.bio}"</p>
+                    <p style="color:var(--secondary-light); font-size:0.9rem; margin-top:5px;">تاريخ التسجيل: <span class="en-num" style="direction: rtl; display: inline-block;">${regDateStr}</span></p>
+                    <div style="margin-top:15px; font-weight:bold; font-size:1.2rem; color:var(--text);">إجمالي النقاط: <span class="en-num" style="color:var(--accent); background:rgba(0,0,0,0.05); padding:5px 15px; border-radius:8px;">${res.total}</span></div>
+                </div>
+                <hr style="border-color:rgba(255,255,255,0.1); margin-bottom:15px;">
+                <h4 style="margin-bottom:15px; color:var(--text);"><i class="fas fa-history"></i> سجل النقاط المكتسبة:</h4>
+                <div style="max-height: 40vh; overflow-y: auto; padding-left: 10px;">
+            `;
+            let detailsHtml = res.details.map(d => `
+                <div style="background:rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.05); padding:12px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; font-weight:bold;">
+                    <div style="flex:1;">${d.desc}</div><strong class="en-num" style="color:var(--secondary-light); font-size:1.1rem; min-width:40px; text-align:left;">+${d.pts}</strong>
+                </div>
+            `).join('') || '<p style="text-align:center; color:var(--text-muted);">لا توجد نقاط محصلة بعد.</p>';
+            container.innerHTML = profileHtml + detailsHtml + '</div>';
+            document.getElementById('userProfileModal').classList.add('active');
+        }
+
+        function showPointsDetails() { showUserProfile(currentUser.nickname); }
+
+        function updateAdminScoreLabels() {
+            const id = document.getElementById('adminMatchSelect').value;
+            const m = matches.find(x => x.id == id);
+            if(m) {
+                document.getElementById('lblTeam1').innerText = m.team1;
+                document.getElementById('lblTeam2').innerText = m.team2;
+            }
+        }
+
+        function populateAdminMatchSelect() {
+            const select = document.getElementById('adminMatchSelect');
+            select.innerHTML = matches.filter(m=>!m.played).map(m => `<option value="${m.id}">${m.team1} ضد ${m.team2}</option>`).join('');
+            if(select.innerHTML !== '') updateAdminScoreLabels();
+        }
+
+        function adminSaveMatch() {
+            const id = document.getElementById('adminMatchSelect').value;
+            const s1 = document.getElementById('adminScore1').value;
+            const s2 = document.getElementById('adminScore2').value;
+            if(!id || s1==='' || s2==='') { alert('يرجى تحديد المباراة وكتابة النتيجة كاملة.'); return;}
+            const m = matches.find(x => x.id == id);
+            if(m) {
+                m.played = true; m.score1 = parseInt(s1); m.score2 = parseInt(s2);
+                localStorage.setItem('wc26_matches_v6', JSON.stringify(matches));
+                alert('تم اعتماد النتيجة.'); location.reload();
+            }
+        }
+
+        function adminAddAd() {
+            const type = document.getElementById('adminAdType').value;
+            const link = document.getElementById('adminAdLink').value;
+            const pos = document.getElementById('adminAdPosition').value;
+            const target = document.getElementById('adminAdTarget').value;
+            if (type === 'image') {
+                const fileInput = document.getElementById('adminAdFile');
+                if(fileInput.files && fileInput.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        adsList.push({ type: 'image', mediaUrl: e.target.result, link: link || '#', pos, target });
+                        localStorage.setItem('wc26_ads_v7', JSON.stringify(adsList));
+                        alert('تم نشر الإعلان بنجاح!'); location.reload();
+                    }
+                    reader.readAsDataURL(fileInput.files[0]);
+                } else { alert('يرجى اختيار صورة الإعلان من جهازك أولاً.'); }
+            } else {
+                const textVal = document.getElementById('adminAdText').value.trim();
+                const colorVal = document.getElementById('adminAdColor').value;
+                if(!textVal) { alert('يرجى كتابة النص الإعلاني أولاً.'); return; }
+                adsList.push({ type: 'text', text: textVal, color: colorVal, link: link || '#', pos, target });
+                localStorage.setItem('wc26_ads_v7', JSON.stringify(adsList));
+                alert('تم نشر الإعلان بنجاح!'); location.reload();
+            }
+        }
+
+        function renderAdminAdsList() {
+            const container = document.getElementById('adminAdsList');
+            if(adsList.length === 0) { container.innerHTML = '<div style="color:var(--text-muted); font-size:0.8rem;">لا توجد إعلانات حالياً.</div>'; return; }
+            container.innerHTML = adsList.map((ad, i) => {
+                let typeName = ad.type === 'text' ? 'نصي' : 'صورة';
+                return `
+                <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.05); padding:8px; margin-bottom:8px; border-radius:5px;">
+                    <span style="font-size:0.8rem; color:var(--text);">إعلان ${i+1} [${typeName}] (${ad.target === 'all' ? 'عام' : 'مخصص'})</span>
+                    <button class="btn btn-danger" style="padding:4px 10px; font-size:0.75rem;" onclick="adminDeleteAd(${i})"><i class="fas fa-trash"></i> حذف</button>
+                </div>`;
+            }).join('');
+        }
+
+        function adminDeleteAd(index) {
+            if(confirm("هل أنت متأكد من حذف هذا الإعلان؟")) {
+                adsList.splice(index, 1);
+                localStorage.setItem('wc26_ads_v7', JSON.stringify(adsList)); location.reload();
+            }
+        }
+
+        function renderAds() {
+            adsList.forEach(ad => {
+                let contentTag = '';
+                if(ad.type === 'text') {
+                    contentTag = `<div style="color:${ad.color}; font-size:1.2rem; font-weight:800; background:rgba(0,0,0,0.5); padding:10px 20px; border-radius:12px; border:2px solid ${ad.color}; box-shadow: 0 5px 15px rgba(0,0,0,0.5); display:inline-block;">${ad.text}</div>`;
+                } else {
+                    contentTag = `<img src="${ad.mediaUrl}" class="ad-media ad-media-img">`;
+                }
+                
+                let mediaTag = ad.link !== '#' ? `<a href="${ad.link}" target="_blank" style="text-decoration:none;">${contentTag}</a>` : contentTag;
+                let containerClass = `ad-container ${ad.pos === 'right' || ad.pos === 'left' ? 'ad-floating ad-' + ad.pos : ''}`;
+                let html = `<div class="${containerClass}">${mediaTag}</div>`;
+                
+                if (ad.target === 'all') {
+                    if(ad.pos === 'top') document.getElementById('headerTop').insertAdjacentHTML('beforebegin', html);
+                    else document.body.insertAdjacentHTML('beforeend', html);
+                } else {
+                    const targetEl = document.getElementById(ad.target);
+                    if(targetEl) {
+                        if(ad.pos === 'bottom') targetEl.insertAdjacentHTML('beforeend', html);
+                        else targetEl.insertAdjacentHTML('afterbegin', html);
+                    }
+                }
+            });
+        }
+
+        function renderNews() { document.getElementById('newsTickerContent').innerHTML = news.map(n => `<div class="ticker-item">${n}</div>`).join(''); }
+
+        function adminSendBroadcast() {
+            const msgHtml = document.getElementById('adminBroadcastMsg').innerHTML;
+            const type = document.getElementById('adminBroadcastType').value;
+            if(msgHtml && msgHtml !== 'اكتب رسالتك هنا...') {
+                broadcasts.push({ id: Date.now(), text: msgHtml, type: type, reads: [] });
+                localStorage.setItem('wc26_broadcasts_v6', JSON.stringify(broadcasts)); 
+                alert('تم الإرسال بنجاح'); location.reload();
+            } else { alert('يرجى كتابة نص الرسالة.'); }
+        }
+
+        function renderAdminBroadcastHistory() {
+            const container = document.getElementById('adminBroadcastHistory');
+            if(broadcasts.length === 0) { container.innerHTML = '<div style="color:var(--text-muted); font-size:0.8rem;">لا توجد رسائل جماعية سابقة.</div>'; return; }
+            const reversed = [...broadcasts].reverse();
+            container.innerHTML = reversed.map(b => {
+                const bDate = new Date(b.id).toLocaleString('en-US', { hour12: false });
+                let tName = b.type === 'info' ? 'عادية' : (b.type === 'yesno' ? 'تصويت' : 'طلب رأي');
+                return `
+                <div style="background:rgba(0,0,0,0.05); border:1px solid rgba(255,255,255,0.05); padding:10px; margin-bottom:10px; border-radius:8px; border-right: 3px solid var(--primary-light);">
+                    <div style="color:var(--secondary-light); margin-bottom:5px; max-height:50px; overflow:hidden;">${b.text}</div>
+                    <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">النوع: ${tName} | الوقت: <span class="en-num">${bDate}</span></div>
+                    <button class="btn btn-primary" style="padding:5px 15px; font-size:0.8rem;" onclick="showBroadcastDetails(${b.id})"><i class="fas fa-eye"></i> تفاصيل الردود (${b.reads.length})</button>
+                </div>`;
+            }).join('');
+        }
+
+        function showBroadcastDetails(bId) {
+            const b = broadcasts.find(x => x.id === bId);
+            const container = document.getElementById('broadcastDetailsList');
+            if(b.reads.length === 0) { container.innerHTML = '<p style="text-align:center; color:var(--text-muted);">لم يقم أحد بقراءة هذه الرسالة بعد.</p>'; } 
+            else {
+                container.innerHTML = b.reads.map(r => {
+                    const rDate = new Date(r.time).toLocaleString('en-US', { hour12: false });
+                    let rUser = users.find(u => u.nickname === r.user);
+                    let color = (rUser && rUser.isAdmin) ? '#e11d48' : 'var(--secondary-light)';
+                    return `<div style="background:rgba(0,0,0,0.05); padding:12px; margin-bottom:10px; border-radius:8px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><strong style="color:${color};">${r.user}</strong><span class="en-num" style="font-size:0.8rem; color:var(--text-muted);">${rDate}</span></div>
+                        <div style="color:var(--text); font-size:0.95rem;">الرد/الخيار: <span style="color:var(--accent); font-weight:bold;">${r.reply}</span></div>
+                    </div>`;
+                }).join('');
+            }
+            document.getElementById('broadcastDetailsModal').classList.add('active');
+        }
+
+        function checkBroadcast() {
+            if(!currentUser) return;
+            const regTime = currentUser.registeredAt || 0;
+            const unreadIndex = broadcasts.findIndex(b => b.id >= regTime && !b.reads.some(r => r.user === currentUser.nickname));
+            if(unreadIndex !== -1) {
+                const unread = broadcasts[unreadIndex];
+                document.getElementById('broadcastMsgText').innerHTML = unread.text;
+                const actions = document.getElementById('broadcastActions');
+                if(unread.type === 'info') {
+                    actions.innerHTML = `<button class="btn btn-primary w-full" onclick="markBroadcastRead(${unread.id}, 'فهمت')">نعم، فهمت</button>`;
+                } else if(unread.type === 'yesno') {
+                    actions.innerHTML = `<div style="display:flex; gap:10px;"><button class="btn btn-primary w-full" onclick="markBroadcastRead(${unread.id}, 'نعم')">نعم</button><button class="btn btn-danger w-full" onclick="markBroadcastRead(${unread.id}, 'لا')">لا</button></div>`;
+                } else if(unread.type === 'input') {
+                    actions.innerHTML = `<input type="text" id="bcInput" class="form-control" style="margin-bottom:10px;" placeholder="رأيك..."><button class="btn btn-primary w-full" onclick="markBroadcastRead(${unread.id}, document.getElementById('bcInput').value)">إرسال الرد</button>`;
+                }
+                document.getElementById('broadcastModal').classList.add('active');
+            }
+        }
+
+        function markBroadcastRead(bId, replyText) {
+            if(!replyText) replyText = "بدون رد";
+            const bIndex = broadcasts.findIndex(x => x.id === bId);
+            if(bIndex !== -1) {
+                broadcasts[bIndex].reads.push({ user: currentUser.nickname, time: Date.now(), reply: replyText });
+                localStorage.setItem('wc26_broadcasts_v6', JSON.stringify(broadcasts));
+                document.getElementById('broadcastModal').classList.remove('active');
+                setTimeout(checkBroadcast, 500);
+            }
+        }
+        
+        function renderAdminUsers() {
+            const tbody = document.getElementById('adminUsersTable');
+            if(!tbody) return;
+            if(users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text-muted); text-align:center; padding: 20px;">لا يوجد مستخدمين مسجلين بعد.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = users.map(u => {
+                let dStr = (u.registeredAt && u.registeredAt > 0) ? new Date(u.registeredAt).toLocaleString('ar-SA', { timeZone: 'Asia/Riyadh', hour12: true, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : 'تاريخ غير متاح';
+                let nameHtml = u.isAdmin ? `<span style="color:#e11d48;">${u.nickname} <i class="fas fa-crown"></i></span>` : u.nickname;
+                
+                return `
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <td style="color:var(--text); font-weight:bold; padding: 15px; vertical-align: middle; text-align: center;">${u.fname}</td>
+                    <td class="en-num" style="color:var(--secondary-light); padding: 15px; vertical-align: middle; text-align: center;">${u.phone}</td>
+                    <td style="color:var(--text); padding: 15px; vertical-align: middle; text-align: center;">${nameHtml}</td>
+                    <td class="en-num" style="color:var(--accent); padding: 15px; vertical-align: middle; text-align: center;">${u.password}</td>
+                    <td class="en-num" style="font-size:0.85rem; color:var(--secondary-light); padding: 15px; vertical-align: middle; direction: rtl; text-align: center;">${dStr}</td>
+                    <td style="font-size:0.85rem; color:var(--text-muted); padding: 15px; vertical-align: middle; word-break: break-word; text-align: center;">${u.bio || '-'}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function register() {
+            const fname = document.getElementById('regFirstName').value;
+            const phone = document.getElementById('regPhone').value;
+            const nick = document.getElementById('regNickname').value; const pass = document.getElementById('regPassword').value;
+            const bio = document.getElementById('regBio').value; const avatarInput = document.getElementById('regAvatar');
+            if(!fname || !phone || !nick || !pass || !bio) { alert('الرجاء تعبئة جميع الحقول المطلوبة'); return; }
+            if(users.find(u => u.nickname === nick)) { alert('الاسم المستعار مستخدم من قبل'); return; }
+
+            const isFirstUser = (users.length === 0);
+            if (avatarInput.files && avatarInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) { saveNewUser(fname, phone, nick, pass, bio, isFirstUser, e.target.result); }
+                reader.readAsDataURL(avatarInput.files[0]);
+            } else { saveNewUser(fname, phone, nick, pass, bio, isFirstUser, null); }
+        }
+
+        function saveNewUser(fname, phone, nickname, password, bio, isAdmin, avatarData) {
+            const newUser = { fname, phone, nickname, password, bio, isAdmin, avatar: avatarData, registeredAt: Date.now() };
+            users.push(newUser);
+            localStorage.setItem('wc26_users_v6', JSON.stringify(users)); currentUser = newUser; localStorage.setItem('wc26_current_user_v6', JSON.stringify(currentUser));
+            if(isAdmin) alert('تم تسجيلك بنجاح كمدير للنظام!'); else alert('تم التسجيل بنجاح!');
+            document.getElementById('registerModal').classList.remove('active'); location.reload();
+        }
+
+        function openLoginModal() {
+            document.getElementById('loginPhone').value = localStorage.getItem('wc26_saved_phone') || '';
+            document.getElementById('loginPassword').value = localStorage.getItem('wc26_saved_pass') || '';
+            document.getElementById('loginRemember').checked = !!localStorage.getItem('wc26_saved_phone');
+            document.getElementById('loginModal').classList.add('active');
+        }
+
+        function login() {
+            const phone = document.getElementById('loginPhone').value;
+            const pass = document.getElementById('loginPassword').value;
+            const remember = document.getElementById('loginRemember').checked;
+            
+            const user = users.find(u => u.phone === phone && u.password === pass);
+            if(!user) { alert('بيانات الدخول غير صحيحة'); return; }
+            
+            if (remember) {
+                localStorage.setItem('wc26_saved_phone', phone);
+                localStorage.setItem('wc26_saved_pass', pass);
+            } else {
+                localStorage.removeItem('wc26_saved_phone');
+                localStorage.removeItem('wc26_saved_pass');
+            }
+            
+            currentUser = user;
+            localStorage.setItem('wc26_current_user_v6', JSON.stringify(currentUser)); 
+            location.reload();
+        }
+
+        function logout() { localStorage.removeItem('wc26_current_user_v6'); location.reload(); }
+
+        function updateUserNav() {
+            const nav = document.getElementById('userNav');
+            if(currentUser) {
+                let adminBadge = currentUser.isAdmin ? '<i class="fas fa-crown" style="margin-right:5px;" title="مدير النظام"></i>' : '';
+                let nameColor = currentUser.isAdmin ? '#e11d48' : 'var(--secondary-light)';
+                let avatarHtml = currentUser.avatar ? `<img src="${currentUser.avatar}" class="user-avatar" style="width:35px; height:35px;">` : '';
+                nav.innerHTML = `<div style="display:flex; align-items:center; gap:8px;">${avatarHtml}<span style="font-weight:800; color:${nameColor};">مرحباً، ${currentUser.nickname} ${adminBadge}</span></div><button class="btn btn-danger" onclick="logout()">تسجيل خروج</button>`;
+            } else { nav.innerHTML = `<button class="btn btn-gold" onclick="openLoginModal()">تسجيل دخول</button><button class="btn btn-primary" onclick="document.getElementById('registerModal').classList.add('active')">عضوية جديدة</button>`; }
+        }
+
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        function showAllOnline() {
+            document.getElementById('allOnlineList').innerHTML = window.currentOnlineList.map(u => {
+                let cleanName = u.split(' ')[0];
+                let userObj = users.find(x => x.nickname === cleanName);
+                let color = (userObj && userObj.isAdmin) ? '#e11d48' : 'white';
+                return `<div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:5px; border-bottom:1px solid rgba(255,255,255,0.1);"><i class="fas fa-user" style="color:var(--secondary); margin-left:8px;"></i> <span style="color:${color};">${u}</span></div>`;
+            }).join('');
+            document.getElementById('onlineModal').classList.add('active');
+        }
+
+        function checkOnlineUsers() {
+            let onlineUsers = JSON.parse(localStorage.getItem('wc26_online_users') || '{}');
+            let now = Date.now(); window.currentOnlineList = [];
+            for(let user in onlineUsers) {
+                if(now - onlineUsers[user].time < 120000) { window.currentOnlineList.push(`${user} (${onlineUsers[user].tab || 'تصفح'})`); } 
+                else { delete onlineUsers[user]; }
+            }
+            localStorage.setItem('wc26_online_users', JSON.stringify(onlineUsers));
+            let textHtml = '';
+            if (window.currentOnlineList.length === 0) {
+                textHtml = 'لا يوجد متصلين غيرك';
+            } else {
+                let formattedList = window.currentOnlineList.map(u => {
+                    let cleanName = u.split(' ')[0];
+                    let userObj = users.find(x => x.nickname === cleanName);
+                    let color = (userObj && userObj.isAdmin) ? '#e11d48' : 'inherit';
+                    return `<span style="color:${color};">${u}</span>`;
+                });
+                if (formattedList.length <= 3) {
+                    textHtml = `المتصلون الآن: ${formattedList.join(' ، ')}`;
+                } else {
+                    const firstThree = formattedList.slice(0, 3);
+                    textHtml = `المتصلون الآن: ${firstThree.join(' ، ')} <span style="color:var(--secondary-light); cursor:pointer; text-decoration:underline; font-size:0.9rem;" onclick="showAllOnline()">(عرض المزيد..)</span>`;
+                }
+            }
+            
+            document.getElementById('onlineCountText').innerHTML = textHtml;
+        }
+    </script>
+</body>
+</html>
