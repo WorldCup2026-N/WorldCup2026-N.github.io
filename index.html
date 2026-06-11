@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- مكاتب Firebase لربط البيانات -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -35,7 +34,6 @@
 
         .en-num { font-family: 'Arial', sans-serif; direction: ltr !important; display: inline-block; }
 
-        /* التعديل الجديد لترويسة الموقع لسد الفراغات */
         .top-widget { background-color: #2b0b3f; padding: 10px 0; position: relative; border-bottom: 2px solid var(--secondary); width: 100%; z-index: 40; box-sizing: border-box; }
         .header-main { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; flex-wrap: wrap; gap: 15px; width: 100%; }
         .tournament-branding { display: flex; align-items: center; gap: 15px; }
@@ -63,7 +61,6 @@
 
         .world-clocks-banner { background: #1e1b4b; border-bottom: 2px solid var(--secondary); padding: 12px 0; overflow: hidden; display: none; width: 100%; }
         .clocks-grid { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; padding: 0 15px; width: 100%; }
-        /* تم إصلاح وميض الساعات هنا وتنعيم الظهور */
         .clock-widget { background: rgba(0,0,0,0.5); border: 1px solid rgba(212, 175, 55, 0.4); padding: 8px 15px; border-radius: 8px; text-align: center; min-width: 120px; animation: smoothFadeIn 0.8s ease-out; }
         @keyframes smoothFadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes pulseAlert { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.05); } }
@@ -160,7 +157,6 @@
         .rules-list li { margin-bottom: 10px; }
         .rules-list strong { color: var(--text); }
 
-        /* تعديلات شاشات الجوال لتحسين العرض بشكل كامل */
         @media (max-width: 992px) { .matches-split { grid-template-columns: 1fr; } }
         @media (max-width: 768px) {
             .header-main { flex-direction: column; text-align: center; align-items: stretch; gap: 15px; }
@@ -361,9 +357,8 @@
                     <button class="btn btn-primary w-full mt-10" onclick="adminPostQuestion()">نشر السؤال</button>
                 </div>
 
-                <!-- ميزة إضافة أو خصم النقاط للمتسابقين -->
                 <div class="group-card" style="border: 2px solid #4ade80;">
-                    <h4 style="color:var(--accent);">تعديل رصيد المتسابق (مكافأة / خصم)</h4>
+                    <h4 style="color:var(--accent);"><i class="fas fa-hand-holding-usd"></i> تعديل رصيد المتسابق (مكافأة / خصم)</h4>
                     <select id="adminBonusUser" class="form-control mt-10"></select>
                     <input type="number" id="adminBonusPoints" class="form-control mt-10 en-num" placeholder="عدد النقاط (استخدم - للخصم، مثال: -5)">
                     <input type="text" id="adminBonusDesc" class="form-control mt-10" placeholder="سبب التعديل (مثال: مكافأة خاصة)">
@@ -489,17 +484,18 @@
                 </div>
 
                 <div class="group-card" style="grid-column: 1 / -1;">
-                    <h4 style="color:var(--secondary-light); margin-bottom: 15px;"><i class="fas fa-users"></i> بيانات المتسابقين المسجلين بالموقع</h4>
-                    <div style="max-height: 300px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;">
-                        <table class="leaderboard-table" style="font-size: 0.9rem; min-width: 600px;">
-                            <thead style="position: sticky; top: 0; background: var(--dark-card);">
+                    <h4 style="color:var(--secondary-light); margin-bottom: 15px;"><i class="fas fa-users-cog"></i> بيانات وإدارة المتسابقين</h4>
+                    <div style="max-height: 400px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;">
+                        <table class="leaderboard-table" style="font-size: 0.85rem; min-width: 800px;">
+                            <thead style="position: sticky; top: 0; background: var(--dark-card); z-index: 10;">
                                 <tr>
                                     <th style="text-align: center;">الاسم الحقيقي</th>
                                     <th style="text-align: center;">الجوال</th>
                                     <th style="text-align: center;">الاسم المستعار</th>
                                     <th style="text-align: center;">الرقم السري</th>
                                     <th style="text-align: center;">تاريخ التسجيل</th>
-                                    <th style="text-align: center;">الوصف</th>
+                                    <th style="text-align: center;">الحالة</th>
+                                    <th style="text-align: center;">إجراءات الإدارة</th>
                                 </tr>
                             </thead>
                             <tbody id="adminUsersTable"></tbody>
@@ -662,17 +658,24 @@
                         adminFound.bio = "إنفانتينو";
                         adminFound.password = "0005000";
                         adminFound.isAdmin = true;
+                        adminFound.status = "active";
                         usersChanged = true;
                     }
                 }
                 if (usersChanged) db.ref('users').set(users);
 
-                // فحص الحساب الحالي وإلغاء تسجيل الدخول إن كان الحساب محذوفاً من القاعدة
+                // فحص الحساب الحالي وإلغاء تسجيل الدخول إن كان الحساب محذوفاً أو محظوراً
                 if (currentUser) {
                     const updatedUser = users.find(u => u.nickname === currentUser.nickname);
                     if (updatedUser) {
-                        currentUser = updatedUser;
-                        localStorage.setItem('wc26_current_user_v6', JSON.stringify(currentUser));
+                        if(updatedUser.status === 'blocked' || updatedUser.status === 'suspended') {
+                            alert('تم إيقاف أو حظر حسابك من قبل الإدارة.');
+                            currentUser = null;
+                            localStorage.removeItem('wc26_current_user_v6');
+                        } else {
+                            currentUser = updatedUser;
+                            localStorage.setItem('wc26_current_user_v6', JSON.stringify(currentUser));
+                        }
                     } else {
                         currentUser = null;
                         localStorage.removeItem('wc26_current_user_v6');
@@ -705,7 +708,6 @@
                 banner.style.display = 'block';
                 if(!clockInterval) {
                     renderClocksPage();
-                    // تحديد الانتقال كل 7 ثواني (7000 ملي ثانية) 
                     clockInterval = setInterval(() => {
                         currentClockPage = (currentClockPage + 1) % Math.ceil(FIFTEEN_CITIES.length / 5);
                         renderClocksPage();
@@ -719,7 +721,6 @@
             const startIndex = currentClockPage * 5;
             const chunk = FIFTEEN_CITIES.slice(startIndex, startIndex + 5);
             const now = new Date();
-            // وضع HTML جديد لتطبيق تأثير الـ FadeIn بسلاسة دون اهتزاز
             grid.innerHTML = chunk.map(city => {
                 const timeString = now.toLocaleTimeString('en-US', { timeZone: city.zone, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
                 return `<div class="clock-widget"><div class="clock-widget-city">${city.name}</div><div class="clock-widget-time en-num">${timeString}</div></div>`;
@@ -727,7 +728,7 @@
         }
 
         function updateMainCountdown() {
-            // توقيت الرياض: الخميس 11 يونيو 2026 الساعة 08:30 مساءً (توقيت جرينتش +3)
+            // توقيت الرياض: الخميس 11 يونيو 2026 الساعة 08:30 مساءً
             const target = new Date('2026-06-11T20:30:00+03:00').getTime();
             const now = new Date().getTime();
             const diff = target - now;
@@ -736,7 +737,6 @@
 
             if(diff <= 0) { 
                 startWorldClocks();
-                // إظهار العبارة لمدة ساعة واحدة (3600000 ملي ثانية) بعد الصفر
                 if (Math.abs(diff) < 3600000) {
                     countdownContainer.style.display = 'block';
                     countdownContainer.innerHTML = `<div style="color: var(--secondary-light); font-size: 1.3rem; font-weight: 800; animation: pulseAlert 1.5s infinite;">الآن ..حفل افتتاح كأس العالم 2026 🎉</div>`;
@@ -1203,15 +1203,13 @@
             db.ref('dailyQuestions').set(dailyQuestions).then(() => { alert('تم حفظ السؤال بنجاح'); location.reload(); });
         }
 
-        // دالة جديدة لتعبئة قائمة المتسابقين لغرض الخصم/الزيادة
         function populateAdminBonusUsers() {
             const select = document.getElementById('adminBonusUser');
             if(select) {
-                select.innerHTML = '<option value="">اختر المتسابق...</option>' + users.map(u => `<option value="${u.nickname}">${u.nickname}</option>`).join('');
+                select.innerHTML = '<option value="">اختر المتسابق...</option>' + users.filter(u => !u.isAdmin).map(u => `<option value="${u.nickname}">${u.nickname}</option>`).join('');
             }
         }
 
-        // تنفيذ عملية الخصم أو الزيادة
         function adminSubmitBonus() {
             const nickname = document.getElementById('adminBonusUser').value;
             const pts = parseInt(document.getElementById('adminBonusPoints').value);
@@ -1266,7 +1264,6 @@
                 }
             });
             
-            // احتساب نقاط الإدارة الإضافية أو المخصومة
             const userObj = users.find(u => u.nickname === username);
             if(userObj && userObj.bonusRecords) {
                 userObj.bonusRecords.forEach(br => {
@@ -1281,7 +1278,7 @@
 
         function renderLeaderboard() {
             const tbody = document.getElementById('leaderboardBody');
-            const board = users.map(u => {
+            const board = users.filter(u => u.status !== 'blocked').map(u => {
                 const res = calculateUserPoints(u.nickname); 
                 return { name: u.nickname, avatar: u.avatar, points: res.total, isAdmin: u.isAdmin, registeredAt: u.registeredAt || 0 };
             }).sort((a, b) => {
@@ -1554,13 +1551,30 @@
             const tbody = document.getElementById('adminUsersTable');
             if(!tbody) return;
             if(users.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text-muted); text-align:center; padding: 20px;">لا يوجد مستخدمين مسجلين بعد.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="color:var(--text-muted); text-align:center; padding: 20px;">لا يوجد مستخدمين مسجلين بعد.</td></tr>';
                 return;
             }
-            tbody.innerHTML = users.map(u => {
+            tbody.innerHTML = users.map((u, index) => {
                 let dStr = (u.registeredAt && u.registeredAt > 0) ? new Date(u.registeredAt).toLocaleString('en-GB', { timeZone: 'Asia/Riyadh', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(',', '') : 'تاريخ غير متاح';
                 let nameHtml = u.isAdmin ? `<span style="color:#e11d48;">${u.nickname} <i class="fas fa-crown"></i></span>` : u.nickname;
                 
+                let statusText = "نشط";
+                let statusColor = "#4ade80";
+                if(u.status === "suspended") { statusText = "موقوف مؤقتاً"; statusColor = "#fef08a"; }
+                if(u.status === "blocked") { statusText = "محظور (مبلك)"; statusColor = "#e11d48"; }
+
+                let actionHtml = '';
+                if(!u.isAdmin) {
+                    actionHtml = `
+                        <div style="display:flex; gap:5px; justify-content:center; flex-wrap:wrap;">
+                            <button class="btn" style="background:#fef08a; color:#0f0728; padding:5px 10px; font-size:0.75rem;" onclick="adminChangeUserStatus('${u.nickname}', 'suspended')">إيقاف</button>
+                            <button class="btn" style="background:#4ade80; color:#0f0728; padding:5px 10px; font-size:0.75rem;" onclick="adminChangeUserStatus('${u.nickname}', 'active')">تفعيل</button>
+                            <button class="btn" style="background:#e11d48; color:white; padding:5px 10px; font-size:0.75rem;" onclick="adminChangeUserStatus('${u.nickname}', 'blocked')">حظر</button>
+                            <button class="btn" style="background:transparent; border:1px solid #e11d48; color:#e11d48; padding:5px 10px; font-size:0.75rem;" onclick="adminDeleteUser('${u.nickname}')">حذف نهائي</button>
+                        </div>
+                    `;
+                }
+
                 return `
                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                     <td style="color:var(--text); font-weight:bold; padding: 15px; vertical-align: middle; text-align: center;">${u.fname}</td>
@@ -1568,9 +1582,31 @@
                     <td style="color:var(--text); padding: 15px; vertical-align: middle; text-align: center;">${nameHtml}</td>
                     <td class="en-num" style="color:var(--accent); padding: 15px; vertical-align: middle; text-align: center;">${u.password}</td>
                     <td class="en-num" style="font-size:0.85rem; color:var(--secondary-light); padding: 15px; vertical-align: middle; direction: rtl; text-align: center;">${dStr}</td>
-                    <td style="font-size:0.85rem; color:var(--text-muted); padding: 15px; vertical-align: middle; word-break: break-word; text-align: center;">${u.bio || '-'}</td>
+                    <td style="font-size:0.85rem; color:${statusColor}; font-weight:bold; padding: 15px; vertical-align: middle; text-align: center;">${statusText}</td>
+                    <td style="padding: 15px; vertical-align: middle; text-align: center;">${actionHtml}</td>
                 </tr>`;
             }).join('');
+        }
+
+        function adminChangeUserStatus(nickname, status) {
+            const userIndex = users.findIndex(u => u.nickname === nickname);
+            if(userIndex !== -1) {
+                users[userIndex].status = status;
+                db.ref('users').set(users).then(() => {
+                    alert('تم تغيير حالة المتسابق بنجاح!');
+                    location.reload();
+                });
+            }
+        }
+
+        function adminDeleteUser(nickname) {
+            if(confirm('هل أنت متأكد من حذف هذا المتسابق نهائياً؟ سيتم مسح حسابه بالكامل ولن يمكن التراجع عن هذا الإجراء.')) {
+                users = users.filter(u => u.nickname !== nickname);
+                db.ref('users').set(users).then(() => {
+                    alert('تم حذف المتسابق نهائياً.');
+                    location.reload();
+                });
+            }
         }
 
         function register() {
@@ -1591,7 +1627,7 @@
         }
 
         function saveNewUser(fname, phone, nickname, password, bio, isAdmin, avatarData) {
-            const newUser = { fname, phone, nickname, password, bio, isAdmin, avatar: avatarData, registeredAt: Date.now() };
+            const newUser = { fname, phone, nickname, password, bio, isAdmin, avatar: avatarData, registeredAt: Date.now(), status: "active" };
             users.push(newUser);
             db.ref('users').set(users).then(() => {
                 finishLogin(newUser, false);
@@ -1614,7 +1650,7 @@
             if (phone === "20262026" && pass === "0005000") {
                 let adminUser = users.find(u => u.phone === "20262026");
                 if (!adminUser) {
-                    adminUser = { fname: "مدير النظام", phone: "20262026", nickname: "رئيس الفيفا", password: pass, bio: "إنفانتينو", isAdmin: true, avatar: null, registeredAt: Date.now() };
+                    adminUser = { fname: "مدير النظام", phone: "20262026", nickname: "رئيس الفيفا", password: pass, bio: "إنفانتينو", isAdmin: true, avatar: null, registeredAt: Date.now(), status: "active" };
                     users.push(adminUser);
                     db.ref('users').set(users);
                 }
@@ -1624,6 +1660,11 @@
 
             const user = users.find(u => u.phone === phone && u.password === pass);
             if(!user) { alert('بيانات الدخول غير صحيحة'); return; }
+
+            // التحقق من الحظر والإيقاف
+            if(user.status === 'blocked') { alert('عذراً، هذا الحساب محظور نهائياً من قبل الإدارة.'); return; }
+            if(user.status === 'suspended') { alert('عذراً، هذا الحساب موقوف مؤقتاً من قبل الإدارة.'); return; }
+
             finishLogin(user, remember);
         }
 
