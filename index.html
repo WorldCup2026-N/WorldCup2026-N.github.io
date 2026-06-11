@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- مكاتب Firebase لربط البيانات -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -85,19 +84,9 @@
         .points-val { font-size: 4rem; font-weight: 800; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .points-desc { color: var(--secondary-light); font-weight: 700; cursor: pointer; text-decoration: underline; margin-top: 10px; }
 
-        .tabs-nav { 
-            display: flex; gap: 10px; margin-bottom: 25px; 
-            background: rgba(0,0,0,0.3); padding: 10px; border-radius: 12px;
-            overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch;
-            position: relative; z-index: 50; scrollbar-width: none;
-        }
+        .tabs-nav { display: flex; gap: 10px; margin-bottom: 25px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 12px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; position: relative; z-index: 50; scrollbar-width: none; }
         .tabs-nav::-webkit-scrollbar { display: none; }
-        .tab-btn { 
-            padding: 12px 20px; border: none; background: transparent; color: var(--text-muted); 
-            font-family: inherit; font-weight: 800; cursor: pointer; border-radius: 8px; 
-            transition: all 0.3s; text-align: center; font-size: 1rem; flex: 0 0 auto;
-            touch-action: manipulation;
-        }
+        .tab-btn { padding: 12px 20px; border: none; background: transparent; color: var(--text-muted); font-family: inherit; font-weight: 800; cursor: pointer; border-radius: 8px; transition: all 0.3s; text-align: center; font-size: 1rem; flex: 0 0 auto; touch-action: manipulation; }
         .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(126, 34, 206, 0.5); }
         .tab-content { display: none; } .tab-content.active { display: block; animation: fadeInContent 0.4s; }
         @keyframes fadeInContent { from { opacity: 0; } to { opacity: 1; } }
@@ -115,7 +104,6 @@
 
         .match-card { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); position: relative; overflow: hidden; }
         .match-header { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 15px;}
-        
         .score-input { width: 60px; height: 50px; text-align: center; background: rgba(0,0,0,0.5); border: 2px solid var(--secondary); color: var(--text); border-radius: 8px; font-size: 1.5rem; font-weight: 800;}
         .joker-btn { background: rgba(212,175,55,0.1); border: 2px solid var(--secondary); padding: 8px 15px; border-radius: 8px; cursor: pointer; color: var(--secondary-light); font-weight: 800; transition: 0.3s; font-family: inherit;}
         .joker-btn.active { background: var(--secondary); color: var(--dark); box-shadow: 0 0 15px var(--secondary); transform: scale(1.05);}
@@ -331,7 +319,7 @@
                     
                     <button class="btn btn-danger w-full mt-10" onclick="adminSaveMatch()">اعتماد النتيجة وإنهاء المباراة</button>
                 </div>
-                
+                 
                 <div class="group-card">
                     <h4 style="color:var(--accent);">طرح سؤال المونديال اليومي</h4>
                     <input type="text" id="adminQText" class="form-control mt-10" placeholder="نص السؤال...">
@@ -353,6 +341,32 @@
                         <input type="text" id="adminQAns10" class="form-control" placeholder="إجابة 10 (اختياري)">
                     </div>
                     <button class="btn btn-primary w-full mt-10" onclick="adminPostQuestion()">نشر السؤال</button>
+                </div>
+
+                <div class="group-card">
+                    <h4 style="color:var(--accent);">إدارة شريط الأخبار</h4>
+                    <div style="display:flex; gap:10px; margin-top:10px;">
+                        <input type="text" id="adminNewsInput" class="form-control" placeholder="اكتب الخبر هنا...">
+                        <button class="btn btn-primary" onclick="adminAddNews()">إضافة</button>
+                    </div>
+                    <label class="mt-10" style="display:block; color:var(--secondary-light); font-size:0.9rem;">سرعة ظهور الأخبار:</label>
+                    <select id="adminNewsSpeed" class="form-control mt-10" onchange="adminChangeNewsSpeed()">
+                        <option value="15">سريع نسبياً (15 ثانية)</option>
+                        <option value="20">متوسط السرعة (20 ثانية)</option>
+                        <option value="25">متوسط (25 ثانية)</option>
+                        <option value="35">بطيء (35 ثانية)</option>
+                    </select>
+                    <hr style="border-color:rgba(255,255,255,0.1); margin:15px 0;">
+                    <h5 style="color:var(--text); margin-bottom:10px;">الأخبار الحالية (الحد الأقصى 20):</h5>
+                    <div id="adminNewsList" style="max-height: 150px; overflow-y: auto; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px;"></div>
+                </div>
+                
+                <div class="group-card">
+                    <h4 style="color:var(--secondary-light);">إدارة رصيد المتسابقين يدوياً</h4>
+                    <select id="adminBonusUser" class="form-control mt-10"></select>
+                    <input type="number" id="adminBonusPoints" class="form-control mt-10 en-num" placeholder="النقاط (اكتب رقماً بالسالب للخصم)" style="text-align:center;">
+                    <input type="text" id="adminBonusReason" class="form-control mt-10" placeholder="السبب (مثال: مكافأة خاصة، خصم بسبب مخالفة)">
+                    <button class="btn btn-gold w-full mt-10" onclick="adminAddBonus()">تنفيذ الإجراء</button>
                 </div>
 
                 <div class="group-card">
@@ -475,16 +489,16 @@
 
                 <div class="group-card" style="grid-column: 1 / -1;">
                     <h4 style="color:var(--secondary-light); margin-bottom: 15px;"><i class="fas fa-users"></i> بيانات المتسابقين المسجلين بالموقع</h4>
-                    <div style="max-height: 300px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;">
-                        <table class="leaderboard-table" style="font-size: 0.9rem; min-width: 600px;">
-                            <thead style="position: sticky; top: 0; background: var(--dark-card);">
+                    <div style="max-height: 400px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;">
+                        <table class="leaderboard-table" style="font-size: 0.9rem; min-width: 800px;">
+                            <thead style="position: sticky; top: 0; background: var(--dark-card); z-index: 5;">
                                 <tr>
                                     <th style="text-align: center;">الاسم الحقيقي</th>
                                     <th style="text-align: center;">الجوال</th>
                                     <th style="text-align: center;">الاسم المستعار</th>
                                     <th style="text-align: center;">الرقم السري</th>
                                     <th style="text-align: center;">تاريخ التسجيل</th>
-                                    <th style="text-align: center;">الوصف</th>
+                                    <th style="text-align: center;">الحالة والإجراء</th>
                                 </tr>
                             </thead>
                             <tbody id="adminUsersTable"></tbody>
@@ -535,7 +549,7 @@
             <div class="form-group"><label>* وصف قصير عنك</label><input type="text" id="regBio" class="form-control"></div>
             <div class="form-group"><label>صورة الحساب الشخصي (اختياري)</label><input type="file" id="regAvatar" accept="image/*" class="form-control"></div>
             <button class="btn btn-gold w-full" onclick="register()">إنشاء حساب</button>
-         </div>
+        </div>
     </div>
 
     <div class="modal-overlay" id="broadcastModal">
@@ -575,7 +589,6 @@
             appId: "1:1000049567169:web:2517995981db98ae0dfb40",
             measurementId: "G-C76VSJCECH"
         };
-
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.database();
 
@@ -610,12 +623,13 @@
             { name: 'موسكو', zone: 'Europe/Moscow' }, { name: 'بيونيس آيرس', zone: 'America/Argentina/Buenos_Aires' }, { name: 'الرباط', zone: 'Africa/Casablanca' },
             { name: 'بكين', zone: 'Asia/Shanghai' }, { name: 'غرينتش', zone: 'UTC' }, { name: 'الدوحة', zone: 'Asia/Qatar' }
         ];
-
+        
         let users = [];
         let currentUser = JSON.parse(localStorage.getItem('wc26_current_user_v6')) || null;
         let matches = [];
         let predictions = {};
         let news = ["أهلاً بكم في مونديال التوقعات 2026"];
+        let newsSpeed = 25; // السرعة الافتراضية
         let dailyQuestions = [];
         let adsList = [];
         let broadcasts = [];
@@ -624,6 +638,8 @@
         window.currentOnlineList = [];
         let currentClockPage = 0;
         let clockInterval = null;
+        let clockSwitchInterval = null;
+        let currentClockElems = [];
         let isDataLoaded = false;
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -633,6 +649,7 @@
                 matches = data.matches || [];
                 predictions = data.predictions || {};
                 news = data.news || ["أهلاً بكم في مونديال التوقعات 2026"];
+                newsSpeed = data.newsSpeed || 25;
                 dailyQuestions = data.dailyQuestions || [];
                 adsList = data.adsList || [];
                 broadcasts = data.broadcasts || [];
@@ -652,7 +669,7 @@
                 }
                 if (usersChanged) db.ref('users').set(users);
 
-                // فحص الحساب الحالي وإلغاء تسجيل الدخول إن كان الحساب محذوفاً من القاعدة
+                // فحص الحساب الحالي
                 if (currentUser) {
                     const updatedUser = users.find(u => u.nickname === currentUser.nickname);
                     if (updatedUser) {
@@ -663,6 +680,12 @@
                         localStorage.removeItem('wc26_current_user_v6');
                     }
                 }
+
+                // إضافة خصائص المستخدم الافتراضية إن لم تكن موجودة (للحالة والنقاط اليدوية)
+                users.forEach(u => {
+                    if (!u.status) u.status = 'active';
+                    if (!u.bonuses) u.bonuses = [];
+                });
 
                 isDataLoaded = true;
                 initUI();
@@ -675,12 +698,41 @@
         });
 
         function initUI() {
-            updateUserNav(); renderNews(); populateTeamSelects(); renderGroups(); renderMatches(); renderLeaderboard();
-            renderDailyTab(); setTimeout(checkBroadcast, 1000); renderAds();
+            updateUserNav(); renderNews(); populateTeamSelects(); renderGroups(); renderMatches(); renderLeaderboard(); renderDailyTab(); setTimeout(checkBroadcast, 1000); renderAds();
             if(currentUser && currentUser.isAdmin) {
                 document.getElementById('adminPanel').classList.remove('hidden');
                 populateAdminMatchSelect(); renderAdminAdsList(); renderAdminBroadcastHistory(); renderAdminUsers();
+                renderAdminNewsPanel(); populateAdminBonusUser();
             }
+        }
+
+        // ==========================================
+        //  تحسين شريط التوقيتات (منع الوميض و 7 ثواني)
+        // ==========================================
+        function updateClockTimes() {
+            const now = new Date();
+            currentClockElems.forEach((elObj) => {
+                if(elObj && elObj.el && elObj.city) {
+                    elObj.el.innerText = now.toLocaleTimeString('en-US', { timeZone: elObj.city.zone, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+                }
+            });
+        }
+
+        function renderClocksPage() {
+            const grid = document.getElementById('clocksGrid');
+            const startIndex = currentClockPage * 5;
+            const chunk = FIFTEEN_CITIES.slice(startIndex, startIndex + 5);
+            
+            // رسم الـ HTML لمرة واحدة للدفعة
+            grid.innerHTML = chunk.map((city, i) => {
+                return `<div class="clock-widget"><div class="clock-widget-city">${city.name}</div><div class="clock-widget-time en-num" id="clock-val-${i}"></div></div>`;
+            }).join('');
+            
+            // تخزين المراجع (Elements) لتحديث ثوانيها برمجياً فقط
+            currentClockElems = chunk.map((city, i) => {
+                return { el: document.getElementById(`clock-val-${i}`), city: city };
+            });
+            updateClockTimes(); // تحديث فوري
         }
 
         function startWorldClocks() {
@@ -689,34 +741,23 @@
                 banner.style.display = 'block';
                 if(!clockInterval) {
                     renderClocksPage();
-                    clockInterval = setInterval(() => {
+                    // تحديث الثواني كل ثانية (دون وميض)
+                    clockInterval = setInterval(updateClockTimes, 1000);
+                    // تغيير الدفعة كل 7 ثواني (كما طلبت)
+                    clockSwitchInterval = setInterval(() => {
                         currentClockPage = (currentClockPage + 1) % 3;
                         renderClocksPage();
-                    }, 5000);
-                    setInterval(renderClocksPage, 1000);
+                    }, 7000);
                 }
             }
         }
 
-        function renderClocksPage() {
-            const grid = document.getElementById('clocksGrid');
-            const startIndex = currentClockPage * 5;
-            const chunk = FIFTEEN_CITIES.slice(startIndex, startIndex + 5);
-            const now = new Date();
-            grid.innerHTML = chunk.map(city => {
-                const timeString = now.toLocaleTimeString('en-US', { timeZone: city.zone, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-                return `<div class="clock-widget"><div class="clock-widget-city">${city.name}</div><div class="clock-widget-time en-num">${timeString}</div></div>`;
-            }).join('');
-        }
-
         function updateMainCountdown() {
-            // توقيت الرياض: الخميس 11 يونيو 2026 الساعة 08:30 مساءً
             const target = new Date('2026-06-11T20:30:00+03:00').getTime();
             const now = new Date().getTime();
             const diff = target - now;
 
             const countdownContainer = document.getElementById('mainCountdownWrapper');
-
             if(diff <= 0) { 
                 startWorldClocks();
                 if (Math.abs(diff) < 3600000) {
@@ -725,14 +766,13 @@
                 } else {
                     countdownContainer.style.display = 'none';
                 }
-                return; 
+                return;
             }
             
             const d = Math.floor(diff / (1000 * 60 * 60 * 24));
             const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const s = Math.floor((diff % (1000 * 60)) / 1000);
-            
             document.getElementById('mainCountdown').innerHTML = `<div style="display:flex; gap:15px; justify-content:center; direction: ltr;"><div style="display:flex; flex-direction:column; align-items:center;"><span class="en-num" style="font-size:1.3rem;">${d}</span><span style="font-size:0.75rem; color:var(--secondary-light);">يوم</span></div><div style="display:flex; flex-direction:column; align-items:center;"><span class="en-num" style="font-size:1.3rem;">${h}</span><span style="font-size:0.75rem; color:var(--secondary-light);">ساعة</span></div><div style="display:flex; flex-direction:column; align-items:center;"><span class="en-num" style="font-size:1.3rem;">${m}</span><span style="font-size:0.75rem; color:var(--secondary-light);">دقيقة</span></div><div style="display:flex; flex-direction:column; align-items:center;"><span class="en-num" style="font-size:1.3rem;">${s}</span><span style="font-size:0.75rem; color:var(--secondary-light);">ثانية</span></div></div>`;
         }
 
@@ -750,6 +790,194 @@
             }
         }
 
+        // ==========================================
+        //  إدارة شريط الأخبار المتقدم
+        // ==========================================
+        function renderNews() { 
+            const tickerEl = document.getElementById('newsTickerContent');
+            tickerEl.style.animationDuration = newsSpeed + 's';
+            tickerEl.innerHTML = news.map(n => `<div class="ticker-item">${n}</div>`).join('');
+        }
+
+        function renderAdminNewsPanel() {
+            document.getElementById('adminNewsSpeed').value = newsSpeed.toString();
+            const listContainer = document.getElementById('adminNewsList');
+            if (news.length === 0) {
+                listContainer.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem; text-align:center;">لا توجد أخبار حالياً.</div>';
+                return;
+            }
+            listContainer.innerHTML = news.map((n, i) => `
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.05); padding:8px 0;">
+                    <span style="font-size:0.85rem; flex:1; padding-left:10px;">${n}</span>
+                    <button class="btn btn-danger" style="padding:4px 8px; font-size:0.75rem;" onclick="adminDeleteNews(${i})"><i class="fas fa-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function adminAddNews() {
+            const val = document.getElementById('adminNewsInput').value.trim();
+            if(!val) return;
+            // الإضافة كمبدأ القنوات الفضائية (الأحدث يدخل في الأخير ليظهر تباعاً)
+            news.push(val); 
+            if(news.length > 20) news.shift(); // إحلال الجديد محل القديم (FIFO)
+            db.ref('news').set(news).then(() => {
+                document.getElementById('adminNewsInput').value = '';
+                renderAdminNewsPanel();
+                renderNews();
+            });
+        }
+
+        function adminDeleteNews(index) {
+            news.splice(index, 1);
+            db.ref('news').set(news).then(() => {
+                renderAdminNewsPanel();
+                renderNews();
+            });
+        }
+
+        function adminChangeNewsSpeed() {
+            newsSpeed = parseInt(document.getElementById('adminNewsSpeed').value);
+            db.ref('newsSpeed').set(newsSpeed).then(() => {
+                renderNews();
+            });
+        }
+
+        // ==========================================
+        //  إدارة رصيد النقاط اليدوية
+        // ==========================================
+        function populateAdminBonusUser() {
+            const select = document.getElementById('adminBonusUser');
+            select.innerHTML = '<option value="">-- اختر المتسابق --</option>' + 
+                users.filter(u => !u.isAdmin).map(u => `<option value="${u.nickname}">${u.nickname}</option>`).join('');
+        }
+
+        function adminAddBonus() {
+            const nickname = document.getElementById('adminBonusUser').value;
+            const pts = parseInt(document.getElementById('adminBonusPoints').value);
+            const reason = document.getElementById('adminBonusReason').value.trim() || 'إجراء إداري';
+            
+            if(!nickname || isNaN(pts)) { alert('يرجى اختيار المتسابق وكتابة النقاط بشكل صحيح.'); return; }
+            
+            const userIndex = users.findIndex(u => u.nickname === nickname);
+            if(userIndex !== -1) {
+                if(!users[userIndex].bonuses) users[userIndex].bonuses = [];
+                users[userIndex].bonuses.push({ pts: pts, reason: reason, time: Date.now() });
+                db.ref('users').set(users).then(() => {
+                    alert('تم تطبيق التعديل على الرصيد بنجاح.');
+                    document.getElementById('adminBonusPoints').value = '';
+                    document.getElementById('adminBonusReason').value = '';
+                    renderLeaderboard();
+                });
+            }
+        }
+
+        // ==========================================
+        //  حساب النقاط العام (متضمن الإضافات اليدوية)
+        // ==========================================
+        function calculateUserPoints(username) {
+            let total = 0;
+            let details = [];
+            matches.filter(m => m.played).forEach(m => {
+                if(predictions[m.id] && predictions[m.id][username]) {
+                    const p = predictions[m.id][username];
+                    const m1 = m.score1, m2 = m.score2, p1 = p.s1, p2 = p.s2;
+                    const actualWinner = m1 > m2 ? 1 : (m1 < m2 ? 2 : 0);
+                    const predWinner = p1 > p2 ? 1 : (p1 < p2 ? 2 : 0);
+                    let pts = 0; let desc = '';
+                    if (actualWinner === predWinner) {
+                        if (m1 === p1 && m2 === p2) {
+                            pts = p.joker ? 6 : 3;
+                            desc = `توقع دقيق لنتيجة: <div style="display:inline-flex; align-items:center; gap:5px; direction:rtl; margin:0 5px; font-weight:bold;"><span style="color:var(--secondary-light)">${m.team1}</span><span class="en-num" style="color:var(--accent)">${m1}</span><span style="color:var(--text)">-</span><span class="en-num" style="color:var(--accent)">${m2}</span><span style="color:var(--secondary-light)">${m.team2}</span></div> ${p.joker ? '<span style="color:var(--accent)">(جوكر)</span>' : ''}`;
+                        } else {
+                            pts = p.joker ? 2 : 1; 
+                            desc = `توقع الفائز في مباراة: <div style="display:inline-flex; align-items:center; gap:5px; direction:rtl; margin:0 5px; font-weight:bold;"><span style="color:var(--secondary-light)">${m.team1}</span><span class="en-num" style="color:var(--accent)">${m1}</span><span style="color:var(--text)">-</span><span class="en-num" style="color:var(--accent)">${m2}</span><span style="color:var(--secondary-light)">${m.team2}</span></div> ${p.joker ? '<span style="color:var(--accent)">(جوكر)</span>' : ''}`;
+                        }
+                    }
+                    if(pts > 0) { total += pts; details.push({desc, pts}); }
+                }
+            });
+            dailyQuestions.forEach(q => {
+                const correctAnswers = q.answers.filter(a => a.correct).sort((a,b) => a.time - b.time);
+                const userAnsIndex = correctAnswers.findIndex(a => a.user === username);
+                if(userAnsIndex !== -1) {
+                    let pts = 0; let descRank = "";
+                    if(userAnsIndex === 0) { pts = 4; descRank = "أسرع إجابة صحيحة"; }
+                    else if(userAnsIndex === 1) { pts = 1; descRank = "ثاني أسرع إجابة صحيحة"; }
+                    else if(userAnsIndex === 2) { pts = 1; descRank = "ثالث أسرع إجابة صحيحة"; }
+                    if(pts > 0) {
+                        total += pts; details.push({desc: `إجابة السؤال اليومي رقم (${q.qNum}) (${descRank})`, pts});
+                    }
+                }
+            });
+            
+            // إضافة رصيد المكافآت/الخصومات اليدوية
+            const userObj = users.find(u => u.nickname === username);
+            if(userObj && userObj.bonuses) {
+                userObj.bonuses.forEach(b => {
+                    total += b.pts;
+                    details.push({desc: b.reason, pts: b.pts});
+                });
+            }
+
+            return { total, details };
+        }
+
+        // ==========================================
+        //  إدارة الأعضاء (حظر، إيقاف، تنشيط)
+        // ==========================================
+        function adminChangeUserStatus(nickname, newStatus) {
+            if(nickname === 'رئيس الفيفا') { alert('لا يمكن تعديل حالة مدير النظام.'); return; }
+            if(confirm(`هل أنت متأكد من تغيير حالة المتسابق (${nickname}) إلى: ${newStatus === 'active' ? 'نشط' : (newStatus === 'suspended' ? 'موقوف مؤقتاً' : 'محظور نهائياً')} ؟`)) {
+                const uIndex = users.findIndex(u => u.nickname === nickname);
+                if(uIndex !== -1) {
+                    users[uIndex].status = newStatus;
+                    db.ref('users').set(users).then(() => {
+                        alert('تم تحديث حالة الحساب بنجاح.');
+                    });
+                }
+            } else {
+                // تراجع مرئي عن التغيير في الـ Select في حال الرفض
+                renderAdminUsers();
+            }
+        }
+
+        function renderAdminUsers() {
+            const tbody = document.getElementById('adminUsersTable');
+            if(!tbody) return;
+            if(users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text-muted); text-align:center; padding: 20px;">لا يوجد مستخدمين مسجلين بعد.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = users.map(u => {
+                let dStr = (u.registeredAt && u.registeredAt > 0) ? new Date(u.registeredAt).toLocaleString('en-GB', { timeZone: 'Asia/Riyadh', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(',', '') : 'تاريخ غير متاح';
+                let nameHtml = u.isAdmin ? `<span style="color:#e11d48;">${u.nickname} <i class="fas fa-crown"></i></span>` : u.nickname;
+                
+                // قائمة التحكم بالحالة
+                let statusSelect = u.isAdmin ? `<span style="color:var(--text-muted); font-size:0.8rem;">مدير النظام</span>` : `
+                    <select class="form-control" style="width: auto; padding: 5px; font-size:0.85rem;" onchange="adminChangeUserStatus('${u.nickname}', this.value)">
+                        <option value="active" ${u.status === 'active' ? 'selected' : ''}>نشط</option>
+                        <option value="suspended" ${u.status === 'suspended' ? 'selected' : ''}>موقوف مؤقتاً</option>
+                        <option value="banned" ${u.status === 'banned' ? 'selected' : ''}>محظور نهائياً</option>
+                    </select>
+                `;
+
+                return `
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <td style="color:var(--text); font-weight:bold; padding: 15px; vertical-align: middle; text-align: center;">${u.fname}</td>
+                    <td class="en-num" style="color:var(--secondary-light); padding: 15px; vertical-align: middle; text-align: center;">${u.phone}</td>
+                    <td style="color:var(--text); padding: 15px; vertical-align: middle; text-align: center;">${nameHtml}</td>
+                    <td class="en-num" style="color:var(--accent); padding: 15px; vertical-align: middle; text-align: center;">${u.password}</td>
+                    <td class="en-num" style="font-size:0.85rem; color:var(--secondary-light); padding: 15px; vertical-align: middle; direction: rtl; text-align: center;">${dStr}</td>
+                    <td style="padding: 15px; vertical-align: middle; text-align: center;">${statusSelect}</td>
+                </tr>`;
+            }).join('');
+        }
+
+
+        // ==========================================
+        // باقي الدوال (مباريات، تسجيل الدخول، إلخ..)
+        // ==========================================
+        
         function populateTeamSelects() {
             let options = '<option value="">اختر المنتخب</option>';
             Object.values(GROUPS_DATA).flat().forEach(team => { options += `<option value="${team}">${team}</option>`; });
@@ -769,8 +997,7 @@
             matches.push({
                 id: Date.now(), team1: t1, team2: t2, date: new Date(dateStr).toISOString(),
                 played: false, score1: null, score2: null,
-                group: (group1 === group2 && group1 !== null && stage === 'المجموعات') ? group1 : 'إقصائية',
-                stage: stage
+                group: (group1 === group2 && group1 !== null && stage === 'المجموعات') ? group1 : 'إقصائية', stage: stage
             });
             db.ref('matches').set(matches).then(() => { alert('تمت إضافة المباراة بنجاح.'); location.reload(); });
         }
@@ -783,13 +1010,11 @@
             const pstM = matches.filter(m => m.played).sort((a,b) => new Date(b.date) - new Date(a.date));
             if(upcM.length === 0) upcomingContainer.innerHTML = '<div style="text-align:center; color:var(--text-muted);">لا توجد مباريات مدرجة حالياً.</div>';
             if(pstM.length === 0) pastContainer.innerHTML = '<div style="text-align:center; color:var(--text-muted);">لا توجد مباريات سابقة.</div>';
-            
             const buildMatchHTML = (m) => {
                 const mDate = new Date(m.date);
                 const mTime = mDate.getTime();
                 const isStarted = mTime <= Date.now();
                 const userPred = (currentUser && predictions[m.id]) ? predictions[m.id][currentUser.nickname] : null;
-                
                 let allPredictionsHtml = '';
                 if (isStarted || m.played) {
                     let preds = predictions[m.id];
@@ -801,9 +1026,7 @@
                             return `<div style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:8px; text-align:center;">
                                 <div style="font-size:0.85rem; font-weight:bold; color:${nameColor}; margin-bottom:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${username}</div>
                                 <div style="display:flex; justify-content:center; align-items:center; gap:5px; direction:rtl; font-weight:bold; background:rgba(0,0,0,0.5); border-radius:4px; padding:2px 5px;">
-                                    <span class="en-num" style="color:var(--accent);">${p.s1}</span>
-                                    <span style="color:white;">-</span>
-                                    <span class="en-num" style="color:var(--accent);">${p.s2}</span>
+                                    <span class="en-num" style="color:var(--accent);">${p.s1}</span> <span style="color:white;">-</span> <span class="en-num" style="color:var(--accent);">${p.s2}</span>
                                 </div>
                                 ${p.joker ? '<div style="font-size:0.7rem; color:var(--secondary-light); margin-top:3px;">🃏 استخدم الجوكر</div>' : ''}
                             </div>`;
@@ -812,9 +1035,7 @@
                         allPredictionsHtml = `
                         <div style="margin-top: 20px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 15px;">
                             <h5 style="color:var(--secondary-light); margin-bottom:10px;"><i class="fas fa-eye"></i> توقعات جميع المتسابقين لهذه المباراة:</h5>
-                            <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap:10px;">
-                                ${predCards}
-                            </div>
+                            <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap:10px;">${predCards}</div>
                         </div>`;
                     } else {
                         allPredictionsHtml = `
@@ -972,7 +1193,6 @@
             btn.disabled = true;
             if(!predictions[matchId]) predictions[matchId] = {};
             predictions[matchId][currentUser.nickname] = { s1: parseInt(s1), s2: parseInt(s2), joker: joker };
-            
             db.ref('predictions').set(predictions).then(() => {
                 alert('تم حفظ التوقع بنجاح!');
                 location.reload();
@@ -1000,7 +1220,6 @@
                     if(stats[b].gd !== stats[a].gd) return stats[b].gd - stats[a].gd;
                     return stats[b].gf - stats[a].gf;
                 });
-                
                 let html = `<div class="group-card">
                     <div class="group-header">المجموعة ${gName}</div>
                     <div style="overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -15px; padding: 0 15px;">
@@ -1161,7 +1380,6 @@
             btn.disabled = true;
             const isCorrect = q.answersList.some(ans => ans === inputVal);
             q.answers.push({ user: currentUser.nickname, text: inputVal, time: Date.now(), correct: isCorrect });
-            
             db.ref('dailyQuestions').set(dailyQuestions).then(() => location.reload());
         }
 
@@ -1181,45 +1399,7 @@
             dailyQuestions.push({
                 id: Date.now(), qNum: qNum, text: text, answersList: answersList, answers: [], forceArchive: false, publishTime: publishTime
             });
-            
             db.ref('dailyQuestions').set(dailyQuestions).then(() => { alert('تم حفظ السؤال بنجاح'); location.reload(); });
-        }
-
-        function calculateUserPoints(username) {
-            let total = 0; let details = [];
-            matches.filter(m => m.played).forEach(m => {
-                if(predictions[m.id] && predictions[m.id][username]) {
-                    const p = predictions[m.id][username];
-                    const m1 = m.score1, m2 = m.score2, p1 = p.s1, p2 = p.s2;
-                    const actualWinner = m1 > m2 ? 1 : (m1 < m2 ? 2 : 0);
-                    const predWinner = p1 > p2 ? 1 : (p1 < p2 ? 2 : 0);
-                    let pts = 0; let desc = '';
-                    if (actualWinner === predWinner) {
-                        if (m1 === p1 && m2 === p2) {
-                            pts = p.joker ? 6 : 3;
-                            desc = `توقع دقيق لنتيجة: <div style="display:inline-flex; align-items:center; gap:5px; direction:rtl; margin:0 5px; font-weight:bold;"><span style="color:var(--secondary-light)">${m.team1}</span><span class="en-num" style="color:var(--accent)">${m1}</span><span style="color:var(--text)">-</span><span class="en-num" style="color:var(--accent)">${m2}</span><span style="color:var(--secondary-light)">${m.team2}</span></div> ${p.joker ? '<span style="color:var(--accent)">(جوكر)</span>' : ''}`;
-                        } else {
-                            pts = p.joker ? 2 : 1; 
-                            desc = `توقع الفائز في مباراة: <div style="display:inline-flex; align-items:center; gap:5px; direction:rtl; margin:0 5px; font-weight:bold;"><span style="color:var(--secondary-light)">${m.team1}</span><span class="en-num" style="color:var(--accent)">${m1}</span><span style="color:var(--text)">-</span><span class="en-num" style="color:var(--accent)">${m2}</span><span style="color:var(--secondary-light)">${m.team2}</span></div> ${p.joker ? '<span style="color:var(--accent)">(جوكر)</span>' : ''}`;
-                        }
-                    }
-                    if(pts > 0) { total += pts; details.push({desc, pts}); }
-                }
-            });
-            dailyQuestions.forEach(q => {
-                const correctAnswers = q.answers.filter(a => a.correct).sort((a,b) => a.time - b.time);
-                const userAnsIndex = correctAnswers.findIndex(a => a.user === username);
-                if(userAnsIndex !== -1) {
-                    let pts = 0; let descRank = "";
-                    if(userAnsIndex === 0) { pts = 4; descRank = "أسرع إجابة صحيحة"; }
-                    else if(userAnsIndex === 1) { pts = 1; descRank = "ثاني أسرع إجابة صحيحة"; }
-                    else if(userAnsIndex === 2) { pts = 1; descRank = "ثالث أسرع إجابة صحيحة"; }
-                    if(pts > 0) {
-                        total += pts; details.push({desc: `إجابة السؤال اليومي رقم (${q.qNum}) (${descRank})`, pts});
-                    }
-                }
-            });
-            return { total, details };
         }
 
         function renderLeaderboard() {
@@ -1274,10 +1454,7 @@
 
         function showUserProfile(username) {
             const user = users.find(u => u.nickname === username);
-            if (!user) {
-                alert('عذراً، لم يتم العثور على بيانات هذا المستخدم في قاعدة البيانات.');
-                return;
-            }
+            if (!user) { alert('عذراً، لم يتم العثور على بيانات هذا المستخدم في قاعدة البيانات.'); return; }
 
             const res = calculateUserPoints(username);
             const container = document.getElementById('userProfileDetails');
@@ -1315,7 +1492,7 @@
             `;
             let detailsHtml = res.details.map(d => `
                 <div style="background:rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.05); padding:12px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; font-weight:bold;">
-                    <div style="flex:1;">${d.desc}</div><strong class="en-num" style="color:var(--secondary-light); font-size:1.1rem; min-width:40px; text-align:left;">+${d.pts}</strong>
+                    <div style="flex:1;">${d.desc}</div><strong class="en-num" style="color:var(--secondary-light); font-size:1.1rem; min-width:40px; text-align:left;">${d.pts > 0 ? '+'+d.pts : d.pts}</strong>
                 </div>
             `).join('') || '<p style="text-align:center; color:var(--text-muted);">لا توجد نقاط محصلة بعد.</p>';
             container.innerHTML = profileHtml + detailsHtml + '</div>';
@@ -1343,7 +1520,8 @@
             if(!id || s1==='' || s2==='') { alert('يرجى تحديد المباراة وكتابة النتيجة كاملة.'); return;}
             const m = matches.find(x => x.id == id);
             if(m) {
-                m.played = true; m.score1 = parseInt(s1); m.score2 = parseInt(s2);
+                m.played = true;
+                m.score1 = parseInt(s1); m.score2 = parseInt(s2);
                 db.ref('matches').set(matches).then(() => { alert('تم اعتماد النتيجة.'); location.reload(); });
             }
         }
@@ -1416,8 +1594,6 @@
                 }
             });
         }
-
-        function renderNews() { document.getElementById('newsTickerContent').innerHTML = news.map(n => `<div class="ticker-item">${n}</div>`).join(''); }
 
         function adminSendBroadcast() {
             const msgHtml = document.getElementById('adminBroadcastMsg').innerHTML;
@@ -1492,37 +1668,16 @@
                 });
             }
         }
-        
-        function renderAdminUsers() {
-            const tbody = document.getElementById('adminUsersTable');
-            if(!tbody) return;
-            if(users.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text-muted); text-align:center; padding: 20px;">لا يوجد مستخدمين مسجلين بعد.</td></tr>';
-                return;
-            }
-            tbody.innerHTML = users.map(u => {
-                let dStr = (u.registeredAt && u.registeredAt > 0) ? new Date(u.registeredAt).toLocaleString('en-GB', { timeZone: 'Asia/Riyadh', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(',', '') : 'تاريخ غير متاح';
-                let nameHtml = u.isAdmin ? `<span style="color:#e11d48;">${u.nickname} <i class="fas fa-crown"></i></span>` : u.nickname;
-                
-                return `
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                    <td style="color:var(--text); font-weight:bold; padding: 15px; vertical-align: middle; text-align: center;">${u.fname}</td>
-                    <td class="en-num" style="color:var(--secondary-light); padding: 15px; vertical-align: middle; text-align: center;">${u.phone}</td>
-                    <td style="color:var(--text); padding: 15px; vertical-align: middle; text-align: center;">${nameHtml}</td>
-                    <td class="en-num" style="color:var(--accent); padding: 15px; vertical-align: middle; text-align: center;">${u.password}</td>
-                    <td class="en-num" style="font-size:0.85rem; color:var(--secondary-light); padding: 15px; vertical-align: middle; direction: rtl; text-align: center;">${dStr}</td>
-                    <td style="font-size:0.85rem; color:var(--text-muted); padding: 15px; vertical-align: middle; word-break: break-word; text-align: center;">${u.bio || '-'}</td>
-                </tr>`;
-            }).join('');
-        }
 
         function register() {
             const fname = document.getElementById('regFirstName').value;
             const phone = document.getElementById('regPhone').value;
-            const nick = document.getElementById('regNickname').value; const pass = document.getElementById('regPassword').value;
-            const bio = document.getElementById('regBio').value; const avatarInput = document.getElementById('regAvatar');
-            if(!fname || !phone || !nick || !pass || !bio) { alert('الرجاء تعبئة جميع الحقول المطلوبة'); return; }
+            const nick = document.getElementById('regNickname').value; 
+            const pass = document.getElementById('regPassword').value;
+            const bio = document.getElementById('regBio').value; 
+            const avatarInput = document.getElementById('regAvatar');
             
+            if(!fname || !phone || !nick || !pass || !bio) { alert('الرجاء تعبئة جميع الحقول المطلوبة'); return; }
             if(phone === "20262026") { alert('هذا الرقم محجوز لإدارة الموقع. يرجى استخدام رقم آخر.'); return; }
             if(users.find(u => u.nickname === nick)) { alert('الاسم المستعار مستخدم من قبل'); return; }
 
@@ -1534,7 +1689,7 @@
         }
 
         function saveNewUser(fname, phone, nickname, password, bio, isAdmin, avatarData) {
-            const newUser = { fname, phone, nickname, password, bio, isAdmin, avatar: avatarData, registeredAt: Date.now() };
+            const newUser = { fname, phone, nickname, password, bio, isAdmin, avatar: avatarData, registeredAt: Date.now(), status: 'active', bonuses: [] };
             users.push(newUser);
             db.ref('users').set(users).then(() => {
                 finishLogin(newUser, false);
@@ -1557,7 +1712,7 @@
             if (phone === "20262026" && pass === "0005000") {
                 let adminUser = users.find(u => u.phone === "20262026");
                 if (!adminUser) {
-                    adminUser = { fname: "مدير النظام", phone: "20262026", nickname: "رئيس الفيفا", password: pass, bio: "إنفانتينو", isAdmin: true, avatar: null, registeredAt: Date.now() };
+                    adminUser = { fname: "مدير النظام", phone: "20262026", nickname: "رئيس الفيفا", password: pass, bio: "إنفانتينو", isAdmin: true, avatar: null, registeredAt: Date.now(), status: 'active', bonuses: [] };
                     users.push(adminUser);
                     db.ref('users').set(users);
                 }
@@ -1567,6 +1722,11 @@
 
             const user = users.find(u => u.phone === phone && u.password === pass);
             if(!user) { alert('بيانات الدخول غير صحيحة'); return; }
+            
+            // تحقق من حالة الحساب (حظر، إيقاف)
+            if(user.status === 'banned') { alert('عذراً، هذا الحساب محظور نهائياً.'); return; }
+            if(user.status === 'suspended') { alert('عذراً، هذا الحساب موقوف مؤقتاً من قبل الإدارة ولا يمكنك الدخول حالياً.'); return; }
+
             finishLogin(user, remember);
         }
 
