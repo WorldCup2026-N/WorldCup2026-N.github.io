@@ -157,7 +157,7 @@
         .rules-list li { margin-bottom: 10px; }
         .rules-list strong { color: var(--text); }
 
-        /* تناسق الإطارات في شاشات الجوال */
+        /* تناسق الإطارات في شاشات الجوال لسد الفراغات */
         @media (max-width: 992px) { .matches-split { grid-template-columns: 1fr; } }
         @media (max-width: 768px) {
             .header-main { flex-direction: column; text-align: center; align-items: stretch; gap: 15px; }
@@ -210,10 +210,10 @@
         </div>
 
         <div class="tabs-nav">
-            <button class="tab-btn active" onclick="switchTab('rulesTab')">📜 الشروط</button>
+            <button class="tab-btn active" onclick="switchTab('rulesTab')">📜 شروط المسابقة</button>
             <button class="tab-btn" onclick="switchTab('matchesTab')">📅 المباريات والتوقعات</button>
-            <button class="tab-btn" onclick="switchTab('groupsTab')">📊 المجموعات</button>
-            <button class="tab-btn" onclick="switchTab('dailyTab')">❓ السؤال اليومي</button>
+            <button class="tab-btn" onclick="switchTab('groupsTab')">📊 ترتيب المجموعات</button>
+            <button class="tab-btn" onclick="switchTab('dailyTab')">❓ سؤال المونديال</button>
             <button class="tab-btn" onclick="switchTab('leaderboardTab')">👑 لوحة الصدارة</button>
         </div>
 
@@ -1227,7 +1227,7 @@
             const text = input.value.trim();
             if(!text) return;
             
-            if(news.length >= 20) news.shift(); // يحذف أقدم خبر
+            if(news.length >= 20) news.shift();
             news.push(text);
             
             db.ref('news').set(news).then(() => {
@@ -1269,7 +1269,6 @@
                 `).join('');
             }
         }
-        // -------------------------
 
         function populateAdminBonusUsers() {
             const select = document.getElementById('adminBonusUser');
