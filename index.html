@@ -670,7 +670,6 @@
                 broadcasts = data.broadcasts || [];
                 onlineUsers = data.onlineUsers || {};
 
-                // تعديل/تهيئة حساب الإدارة تلقائياً
                 let adminFound = users.find(u => u.phone === "20262026");
                 let usersChanged = false;
                 if (adminFound) {
@@ -685,7 +684,6 @@
                 }
                 if (usersChanged) db.ref('users').set(users);
 
-                // فحص الحساب الحالي وإلغاء تسجيل الدخول إن كان الحساب محذوفاً أو محظوراً
                 if (currentUser) {
                     const updatedUser = users.find(u => u.nickname === currentUser.nickname);
                     if (updatedUser) {
@@ -723,14 +721,12 @@
             }
         }
 
-        // ------------------ التوقيتات والساعات ------------------
         function startWorldClocks() {
             const banner = document.getElementById('worldClocksBanner');
             if (banner.style.display !== 'block') {
                 banner.style.display = 'block';
                 if(!clockInterval) {
                     renderClocksPage();
-                    // تحديد الانتقال كل 7 ثواني (7000 ملي ثانية) 
                     clockInterval = setInterval(() => {
                         currentClockPage = (currentClockPage + 1) % Math.ceil(FIFTEEN_CITIES.length / 5);
                         renderClocksPage();
@@ -744,7 +740,6 @@
             const startIndex = currentClockPage * 5;
             const chunk = FIFTEEN_CITIES.slice(startIndex, startIndex + 5);
             const now = new Date();
-            // وضع HTML جديد لتطبيق تأثير الـ FadeIn بسلاسة دون اهتزاز
             grid.innerHTML = chunk.map(city => {
                 const timeString = now.toLocaleTimeString('en-US', { timeZone: city.zone, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
                 return `<div class="clock-widget"><div class="clock-widget-city">${city.name}</div><div class="clock-widget-time en-num">${timeString}</div></div>`;
@@ -752,7 +747,6 @@
         }
 
         function updateMainCountdown() {
-            // توقيت الرياض: الخميس 11 يونيو 2026 الساعة 08:30 مساءً
             const target = new Date('2026-06-11T20:30:00+03:00').getTime();
             const now = new Date().getTime();
             const diff = target - now;
@@ -761,12 +755,10 @@
 
             if(diff <= 0) { 
                 startWorldClocks();
-                // إظهار العبارة لمدة ساعة واحدة (3600000 ملي ثانية) بعد الصفر
                 if (Math.abs(diff) < 3600000) {
                     countdownContainer.style.display = 'block';
                     countdownContainer.innerHTML = `<div style="color: var(--secondary-light); font-size: 1.3rem; font-weight: 800; animation: pulseAlert 1.5s infinite;">الآن ..حفل افتتاح كأس العالم 2026 🎉</div>`;
                 } else {
-                    // إخفاء المربع بالكامل بعد انقضاء الساعة
                     countdownContainer.style.display = 'none';
                 }
                 return; 
@@ -972,7 +964,7 @@
                     }
                 }
             });
-            if(needsRender) renderMatches(); // إعادة الرندرة لإظهار توقعات الجميع عند بداية المباراة
+            if(needsRender) renderMatches();
         }
 
         function toggleJoker(matchId, btn) {
@@ -1045,7 +1037,6 @@
                     return stats[b].gf - stats[a].gf;
                 });
                 
-                // احتواء الجدول في إطار قابل للسحب لعدم تشويه المظهر في الجوالات
                 let html = `<div class="group-card">
                     <div class="group-header">المجموعة ${gName}</div>
                     <div style="overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%;">
@@ -1096,7 +1087,6 @@
                 const pTime = q.publishTime || q.id;
                 const isPublished = Date.now() >= pTime;
                 
-                // إخفاء الأسئلة المجدولة مستقبلاً عن المتسابقين العاديين
                 if (!isPublished && (!currentUser || !currentUser.isAdmin)) return;
                 
                 let scheduledBadge = (!isPublished && currentUser && currentUser.isAdmin) ? `<span style="background:var(--secondary); color:var(--dark); padding:3px 10px; border-radius:6px; font-size:0.8rem; margin-left:10px; font-weight:bold;">⏳ مجدول للنشر: <span class="en-num" style="direction:rtl;">${new Date(pTime).toLocaleString('en-GB', { timeZone: 'Asia/Riyadh', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(',', '')}</span></span>` : '';
@@ -1118,7 +1108,6 @@
                     let ansUser = users.find(u => u.nickname === a.user);
                     let nameColor = (ansUser && ansUser.isAdmin) ? '#e11d48' : 'var(--text)';
                     
-                    // تلوين إطار الإجابة (أخضر للصحيح، أحمر للخاطئ)
                     let bgCol = a.correct ? 'rgba(74, 222, 128, 0.15)' : 'rgba(225, 29, 72, 0.15)';
                     let borderCol = a.correct ? '2px solid #4ade80' : '2px solid #e11d48';
                     let iconHtml = a.correct ? '<i class="fas fa-check" style="color:#4ade80;"></i>' : '<i class="fas fa-times" style="color:#e11d48;"></i>';
@@ -1232,18 +1221,19 @@
             db.ref('dailyQuestions').set(dailyQuestions).then(() => { alert('تم حفظ السؤال بنجاح'); location.reload(); });
         }
 
+        // --- دوال شريط الأخبار ---
         function adminAddNews() {
             const input = document.getElementById('adminNewNewsInput');
             const text = input.value.trim();
             if(!text) return;
             
-            if(news.length >= 20) news.shift(); // يحذف أول خبر إذا وصل العدد لـ 20
+            if(news.length >= 20) news.shift(); // يحذف أقدم خبر
             news.push(text);
             
             db.ref('news').set(news).then(() => {
                 input.value = '';
                 renderNews();
-                renderAdminNews();
+                if(document.getElementById('adminNewsList')) renderAdminNews();
                 alert('تمت إضافة الخبر بنجاح');
             });
         }
@@ -1254,7 +1244,7 @@
                 if(news.length === 0) news = ["أهلاً بكم في مونديال التوقعات 2026"];
                 db.ref('news').set(news).then(() => {
                     renderNews();
-                    renderAdminNews();
+                    if(document.getElementById('adminNewsList')) renderAdminNews();
                 });
             }
         }
@@ -1273,12 +1263,13 @@
                 document.getElementById('adminNewsSpeed').value = newsSpeed;
                 list.innerHTML = news.map((n, i) => `
                     <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.2); padding:8px; margin-bottom:5px; border-radius:5px;">
-                        <span style="font-size:0.9rem; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${n}</span>
+                        <span style="font-size:0.9rem; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width: 80%;">${n}</span>
                         <button class="btn btn-danger" style="padding:4px 10px; font-size:0.75rem;" onclick="adminDeleteNews(${i})"><i class="fas fa-trash"></i></button>
                     </div>
                 `).join('');
             }
         }
+        // -------------------------
 
         function populateAdminBonusUsers() {
             const select = document.getElementById('adminBonusUser');
@@ -1341,7 +1332,6 @@
                 }
             });
             
-            // احتساب نقاط الإدارة الإضافية أو المخصومة
             const userObj = users.find(u => u.nickname === username);
             if(userObj && userObj.bonusRecords) {
                 userObj.bonusRecords.forEach(br => {
@@ -1549,12 +1539,6 @@
             });
         }
 
-        function renderNews() { 
-            const tickerContent = document.getElementById('newsTickerContent');
-            tickerContent.innerHTML = news.map(n => `<div class="ticker-item">${n}</div>`).join(''); 
-            tickerContent.style.animationDuration = newsSpeed;
-        }
-
         function adminSendBroadcast() {
             const msgHtml = document.getElementById('adminBroadcastMsg').innerHTML;
             const type = document.getElementById('adminBroadcastType').value;
@@ -1743,7 +1727,6 @@
             const user = users.find(u => u.phone === phone && u.password === pass);
             if(!user) { alert('بيانات الدخول غير صحيحة'); return; }
 
-            // التحقق من الحظر والإيقاف
             if(user.status === 'blocked') { alert('عذراً، هذا الحساب محظور نهائياً من قبل الإدارة.'); return; }
             if(user.status === 'suspended') { alert('عذراً، هذا الحساب موقوف مؤقتاً من قبل الإدارة.'); return; }
 
