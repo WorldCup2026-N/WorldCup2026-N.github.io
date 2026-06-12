@@ -359,6 +359,8 @@
                         <option value="50">بطيء جداً (50 ثانية)</option>
                         <option value="75">بطيء للغاية (75 ثانية)</option>
                         <option value="100">أبطأ شيء (100 ثانية)</option>
+                        <option value="150">بطيء بشكل كبير (150 ثانية)</option>
+                        <option value="200">أبطأ سرعة ممكنة (200 ثانية)</option>
                     </select>
                     <hr style="border-color:rgba(255,255,255,0.1); margin:15px 0;">
                     <h5 style="color:var(--text); margin-bottom:10px;">الأخبار الحالية (الحد الأقصى 20):</h5>
@@ -658,7 +660,6 @@
                 news = data.news || ["أهلاً بكم في مونديال التوقعات 2026"];
                 newsSpeed = data.newsSpeed || 25;
                 
-                // إضافة الحماية للقوائم الفارغة (السبب الرئيسي للمشكلة)
                 dailyQuestions = data.dailyQuestions || [];
                 dailyQuestions.forEach(q => { 
                     if (!q.answers) q.answers = []; 
@@ -674,7 +675,6 @@
 
                 onlineUsers = data.onlineUsers || {};
 
-                // تعديل/تهيئة حساب الإدارة تلقائياً
                 let adminFound = users.find(u => u.phone === "20262026");
                 let usersChanged = false;
                 if (adminFound) {
@@ -688,7 +688,6 @@
                 }
                 if (usersChanged) db.ref('users').set(users);
 
-                // فحص الحساب الحالي
                 if (currentUser) {
                     const updatedUser = users.find(u => u.nickname === currentUser.nickname);
                     if (updatedUser) {
@@ -700,7 +699,6 @@
                     }
                 }
 
-                // إضافة خصائص المستخدم الافتراضية إن لم تكن موجودة
                 users.forEach(u => {
                     if (!u.status) u.status = 'active';
                     if (!u.bonuses) u.bonuses = [];
@@ -804,7 +802,9 @@
         function renderNews() { 
             const tickerEl = document.getElementById('newsTickerContent');
             tickerEl.style.animationDuration = newsSpeed + 's';
-            tickerEl.innerHTML = news.map(n => `<div class="ticker-item">${n}</div>`).join('');
+            // نقوم بعكس ترتيب الأخبار لضمان ظهور الأحدث أولاً
+            const reversedNews = [...news].reverse();
+            tickerEl.innerHTML = reversedNews.map(n => `<div class="ticker-item">${n}</div>`).join('');
         }
 
         function renderAdminNewsPanel() {
@@ -1817,7 +1817,6 @@
                 let changed = false;
                 for(let user in onlineUsers) {
                     if(now - onlineUsers[user].time < 120000) {
-                        // حفظ البيانات ككائن (Object) لضمان عدم حدوث خطأ إذا كان الاسم يتكون من كلمتين مثل "رئيس الفيفا"
                         window.currentOnlineList.push({ name: user, tab: onlineUsers[user].tab || 'تصفح' });
                     } else {
                         delete onlineUsers[user];
