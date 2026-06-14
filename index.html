@@ -1022,6 +1022,7 @@
             db.ref('matches').set(matches).then(() => { alert('تمت إضافة المباراة بنجاح.'); location.reload(); });
         }
 
+        // تم تطبيق الإصلاح هنا لمنع حلقة الإعادة (Render Loop) التي كانت تجمّد الحقول
         function renderMatches() {
             const upcomingContainer = document.getElementById('upcomingMatches');
             const pastContainer = document.getElementById('pastMatches');
@@ -1030,12 +1031,14 @@
             const pstM = matches.filter(m => m.played).sort((a,b) => new Date(b.date) - new Date(a.date));
             if(upcM.length === 0) upcomingContainer.innerHTML = '<div style="text-align:center; color:var(--text-muted);">لا توجد مباريات مدرجة حالياً.</div>';
             if(pstM.length === 0) pastContainer.innerHTML = '<div style="text-align:center; color:var(--text-muted);">لا توجد مباريات سابقة.</div>';
+            
             const buildMatchHTML = (m) => {
                 const mDate = new Date(m.date);
                 const mTime = mDate.getTime();
                 const isStarted = mTime <= getRealTime();
                 const userPred = (currentUser && predictions[m.id]) ? predictions[m.id][currentUser.nickname] : null;
                 let allPredictionsHtml = '';
+                
                 if (isStarted || m.played) {
                     let preds = predictions[m.id];
                     if (preds && Object.keys(preds).length > 0) {
@@ -1071,9 +1074,10 @@
                             <span style="color:var(--secondary-light); font-weight:800;">${m.group !== 'إقصائية' ? `المجموعة ${m.group}` : m.stage}</span>
                             <div style="text-align:left;">
                                 <span class="en-num" style="font-size:0.9rem">${mDate.toLocaleDateString('en-US')} ${mDate.toLocaleTimeString('en-US',{hour:'2-digit', minute:'2-digit'})}</span>
-                                ${!m.played ? `<br><span id="timer-${m.id}" class="match-timer en-num">جاري الحساب...</span>` : ''}
+                                ${!m.played ? `<br><span id="timer-${m.id}" class="match-timer en-num" ${isStarted ? 'style="background-color:#e11d48; color:white;"' : ''}>${isStarted ? 'STARTED' : 'جاري الحساب...'}</span>` : ''}
                             </div>
                         </div>`;
+                        
                 if(!m.played) {
                     if (userPred) {
                         html += `
@@ -1091,26 +1095,38 @@
                             ${userPred.joker ? '<div style="margin-top:10px; color:var(--secondary-light); font-weight:bold;"><i class="fas fa-star"></i> تم تفعيل بطاقة الجوكر 🃏</div>' : ''}
                         </div>`;
                     } else {
-                        const s1 = ''; const s2 = ''; const jActive = '';
-                        const allowedJokerStages = ['المجموعات', 'دور الـ32', 'دور الـ16'];
-                        const showJoker = allowedJokerStages.includes(m.stage);
-                        html += `
-                        <div style="background:rgba(255,255,255,0.03); padding:15px; border-radius:8px;">
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <div style="flex:1; text-align:right; font-size:1.3rem; font-weight:800; display:flex; align-items:center; gap:8px;">${getFlag(m.team1)} <span>${m.team1}</span></div>
-                                <div style="display:flex; align-items:center; gap:10px; direction:rtl;">
-                                    <input type="number" id="pred_${m.id}_1" class="score-input en-num" value="${s1}" min="0">
-                                    <span style="color:var(--accent); font-weight:bold; font-size:1.2rem;">-</span>
-                                    <input type="number" id="pred_${m.id}_2" class="score-input en-num" value="${s2}" min="0">
+                        // التصميم الجديد: التحقق من الانطلاق مباشرة داخل عملية الرسم لمنع التضارب
+                        if (isStarted) {
+                            html += `
+                            <div style="background:rgba(255,255,255,0.03); padding:15px; border-radius:8px; text-align:center;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; opacity:0.5;">
+                                    <div style="flex:1; text-align:right; font-size:1.3rem; font-weight:800; display:flex; align-items:center; gap:8px;">${getFlag(m.team1)} <span>${m.team1}</span></div>
+                                    <div style="flex:1; text-align:left; font-size:1.3rem; font-weight:800; display:flex; align-items:center; justify-content:flex-end; gap:8px;"><span>${m.team2}</span> ${getFlag(m.team2)}</div>
                                 </div>
-                                <div style="flex:1; text-align:left; font-size:1.3rem; font-weight:800; display:flex; align-items:center; justify-content:flex-end; gap:8px;"><span>${m.team2}</span> ${getFlag(m.team2)}</div>
-                            </div>
-                            ${currentUser ? `
-                            <div class="prediction-controls mt-10" id="pred-area-${m.id}" style="display: flex; justify-content: center; align-items: center; gap: 15px; flex-wrap: wrap;">
-                                ${showJoker ? `<button class="joker-btn ${jActive}" onclick="toggleJoker(${m.id}, this)">🃏 تفعيل الجوكر</button>` : ''}
-                                <button class="btn btn-primary" onclick="savePrediction(${m.id}, this)">حفظ التوقع</button>
-                            </div>` : `<div style="text-align:center; margin-top:15px; color:var(--text-muted); font-weight:bold;">سجل دخول لتتوقع النتيجة</div>`}
-                        </div>`;
+                                <div style="color:#e11d48; font-weight:800; font-size:1.1rem; margin-top:15px;"><i class="fas fa-lock"></i> أُغلقت التوقعات (المباراة بدأت)</div>
+                            </div>`;
+                        } else {
+                            const s1 = ''; const s2 = ''; const jActive = '';
+                            const allowedJokerStages = ['المجموعات', 'دور الـ32', 'دور الـ16'];
+                            const showJoker = allowedJokerStages.includes(m.stage);
+                            html += `
+                            <div style="background:rgba(255,255,255,0.03); padding:15px; border-radius:8px;">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <div style="flex:1; text-align:right; font-size:1.3rem; font-weight:800; display:flex; align-items:center; gap:8px;">${getFlag(m.team1)} <span>${m.team1}</span></div>
+                                    <div style="display:flex; align-items:center; gap:10px; direction:rtl;">
+                                        <input type="number" id="pred_${m.id}_1" class="score-input en-num" value="${s1}" min="0">
+                                        <span style="color:var(--accent); font-weight:bold; font-size:1.2rem;">-</span>
+                                        <input type="number" id="pred_${m.id}_2" class="score-input en-num" value="${s2}" min="0">
+                                    </div>
+                                    <div style="flex:1; text-align:left; font-size:1.3rem; font-weight:800; display:flex; align-items:center; justify-content:flex-end; gap:8px;"><span>${m.team2}</span> ${getFlag(m.team2)}</div>
+                                </div>
+                                ${currentUser ? `
+                                <div class="prediction-controls mt-10" id="pred-area-${m.id}" style="display: flex; justify-content: center; align-items: center; gap: 15px; flex-wrap: wrap;">
+                                    ${showJoker ? `<button class="joker-btn ${jActive}" onclick="toggleJoker(${m.id}, this)">🃏 تفعيل الجوكر</button>` : ''}
+                                    <button class="btn btn-primary" onclick="savePrediction(${m.id}, this)">حفظ التوقع</button>
+                                </div>` : `<div style="text-align:center; margin-top:15px; color:var(--text-muted); font-weight:bold;">سجل دخول لتتوقع النتيجة</div>`}
+                            </div>`;
+                        }
                     }
                 } else {
                     html += `
@@ -1141,13 +1157,13 @@
             pstM.forEach(m => pastContainer.innerHTML += buildMatchHTML(m));
         }
 
+        // تم تحسين الدالة لمنع أي تحديث متكرر يضر بالصفحة
         function updateMatchTimers() {
             const now = getRealTime();
             let needsRender = false;
             matches.forEach(m => {
                 if(!m.played) {
                     const timerEl = document.getElementById(`timer-${m.id}`);
-                    const predArea = document.getElementById(`pred-area-${m.id}`);
                     if(timerEl) {
                         const mTime = new Date(m.date).getTime();
                         const diff = mTime - now;
@@ -1158,12 +1174,11 @@
                             const s = Math.floor((diff % (1000 * 60)) / 1000);
                             timerEl.innerText = `${d}d ${h}h ${min}m ${s}s`;
                         } else {
-                            timerEl.innerText = 'STARTED';
-                            timerEl.style.backgroundColor = '#e11d48'; timerEl.style.color = 'white';
-                            if(predArea && !predArea.classList.contains('locked')) {
-                                predArea.innerHTML = '<div style="color:#e11d48; font-weight:800; font-size:1.1rem;"><i class="fas fa-lock"></i> أُغلقت التوقعات (المباراة بدأت)</div>';
-                                predArea.classList.add('locked');
-                                needsRender = true; 
+                            if (timerEl.innerText !== 'STARTED') {
+                                timerEl.innerText = 'STARTED';
+                                timerEl.style.backgroundColor = '#e11d48'; 
+                                timerEl.style.color = 'white';
+                                needsRender = true; // طلب التحديث لمرة واحدة فقط لقفل الحقول
                             }
                         }
                     }
@@ -1201,12 +1216,10 @@
             btn.classList.toggle('active');
         }
 
-        // الحل الجذري والنهائي لمنع ضياع التوقعات بتطبيق التحديث النقطي (Granular Update)
         function savePrediction(matchId, btn) {
             const m = matches.find(x => x.id === matchId);
             if(!m) return;
 
-            // حماية إضافية: التأكد من أن المباراة لم تبدأ باستخدام توقيت السيرفر الفعلي
             const mTime = new Date(m.date).getTime();
             if(getRealTime() >= mTime) {
                 alert('عذراً، لقد بدأت المباراة وأُغلق باب التوقعات!');
@@ -1779,7 +1792,6 @@
             }
         }
 
-        // تم تطبيق نفس التحديث النقطي هنا لضمان عدم مسح قراءات الأعضاء الآخرين للرسالة
         function markBroadcastRead(bId, replyText) {
             if(!replyText) replyText = "بدون رد";
             db.ref('broadcasts').once('value').then(snap => {
