@@ -602,7 +602,6 @@
 
         // -----------------------------------------------------
         // حل جذري لاختلاف توقيت الأجهزة (Client Clock Drift) 
-        // عبر جلب التوقيت الفعلي من سيرفرات فايربيس
         // -----------------------------------------------------
         let serverTimeOffset = 0;
         db.ref('.info/serverTimeOffset').on('value', function(snapshot) {
@@ -676,14 +675,12 @@
                 broadcasts.forEach(b => { if (!b.reads) b.reads = []; });
                 onlineUsers = data.onlineUsers || {};
 
-                // معالجة بيانات الأسئلة اليومية وتصحيح التواريخ التاريخية المضروبة بسبب ساعات المتسابقين
                 let dailyQsChanged = false;
                 dailyQuestions = data.dailyQuestions || [];
                 dailyQuestions.forEach(q => { 
                     if (!q.answers) q.answers = []; 
                     if (!q.answersList) q.answersList = []; 
                     
-                    // التصحيح التاريخي: إذا تم رفع إجابات متتالية ولكن تواريخها متلخبطة بسبب اختلاف ساعات الأجهزة، يتم إعادة ضبطها زمنياً بحسب ترتيب دخولها للمصفوفة
                     if(q.answers.length > 1) {
                         let needsFix = false;
                         for(let i = 0; i < q.answers.length - 1; i++) {
@@ -694,7 +691,7 @@
                         if(needsFix) {
                             let baseTime = q.answers[0].time;
                             q.answers.forEach((ans, idx) => {
-                                ans.time = baseTime + (idx * 1000); // إعطاء فارق ثانية تصاعدي لكل إجابة لضمان الترتيب التاريخي العادل
+                                ans.time = baseTime + (idx * 1000); 
                             });
                             dailyQsChanged = true;
                         }
@@ -1204,23 +1201,51 @@
             btn.classList.toggle('active');
         }
 
+        // الحل الجذري والنهائي لمنع ضياع التوقعات بتطبيق التحديث النقطي (Granular Update)
         function savePrediction(matchId, btn) {
-            if(predictions[matchId] && predictions[matchId][currentUser.nickname]) {
-                alert('لقد قمت بإرسال التوقع لهذه المباراة مسبقاً ولا يمكنك إرساله مرتين.');
+            const m = matches.find(x => x.id === matchId);
+            if(!m) return;
+
+            // حماية إضافية: التأكد من أن المباراة لم تبدأ باستخدام توقيت السيرفر الفعلي
+            const mTime = new Date(m.date).getTime();
+            if(getRealTime() >= mTime) {
+                alert('عذراً، لقد بدأت المباراة وأُغلق باب التوقعات!');
+                location.reload();
                 return;
             }
+
             const s1 = document.getElementById(`pred_${matchId}_1`).value;
             const s2 = document.getElementById(`pred_${matchId}_2`).value;
             const jokerBtn = document.querySelector(`#pred_${matchId}_1`).closest('.match-card').querySelector('.joker-btn');
             const joker = jokerBtn ? jokerBtn.classList.contains('active') : false;
-            if(s1==='' || s2==='') { alert('يرجى إدخال النتيجة للطرفين'); return; }
             
+            if(s1 === '' || s2 === '') { alert('يرجى إدخال النتيجة للطرفين'); return; }
+
             btn.disabled = true;
-            if(!predictions[matchId]) predictions[matchId] = {};
-            predictions[matchId][currentUser.nickname] = { s1: parseInt(s1), s2: parseInt(s2), joker: joker };
-            db.ref('predictions').set(predictions).then(() => {
-                alert('تم حفظ التوقع بنجاح!');
-                location.reload();
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+
+            const predRef = db.ref(`predictions/${matchId}/${currentUser.nickname}`);
+            
+            predRef.once('value').then(snap => {
+                if(snap.exists()) {
+                    alert('لقد قمت بإرسال التوقع لهذه المباراة مسبقاً ولا يمكنك إرساله مرتين.');
+                    btn.disabled = false;
+                    btn.innerHTML = 'حفظ التوقع';
+                    return;
+                }
+                
+                predRef.set({
+                    s1: parseInt(s1),
+                    s2: parseInt(s2),
+                    joker: joker
+                }).then(() => {
+                    alert('تم حفظ التوقع بنجاح!');
+                    location.reload();
+                }).catch(err => {
+                    alert('حدث خطأ أثناء الاتصال، يرجى المحاولة مرة أخرى.');
+                    btn.disabled = false;
+                    btn.innerHTML = 'حفظ التوقع';
+                });
             });
         }
 
@@ -1273,7 +1298,6 @@
             });
         }
 
-        // الإصلاح الموجه لحل تصادمات التحكم للإدمن
         function adminForceArchive(qId) {
             if(confirm('هل أنت متأكد من أرشفة هذا السؤال ونقله للأرشيف فوراً؟')) {
                 db.ref('dailyQuestions').once('value').then(snap => {
@@ -1287,7 +1311,6 @@
             }
         }
 
-        // الإصلاح الموجه لمنع المسح التلقائي للإجابات عند تصحيح الإدارة لها
         function adminToggleAnswerStatus(qId, username, isCorrect) {
             if(!confirm('هل أنت متأكد من تغيير حالة هذه الإجابة؟')) return;
             db.ref('dailyQuestions').once('value').then(snap => {
@@ -1428,8 +1451,6 @@
             }
         }
 
-        // الإصلاح الموجه والنهائي لمنع الكتابة الفوقية والتصادم (Race Conditions)
-        // بالإضافة لإعتماد الوقت الحقيقي الدقيق من السيرفرات (Real Server Time)
         function submitDailyAnswer(qId, btn) {
             const inputVal = document.getElementById(`dqAnswer_${qId}`).value.trim();
             if(!inputVal) return;
@@ -1437,7 +1458,6 @@
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
             
-            // جلب البيانات بشكل استباقي لتجنب الكتابة الفوقية إذا دخل متسابق آخر قبل أجزاء من الثانية
             db.ref('dailyQuestions').once('value').then(snap => {
                 let freshQs = snap.val() || [];
                 let qIndex = freshQs.findIndex(x => x.id === qId);
@@ -1445,7 +1465,6 @@
                 if(qIndex !== -1) {
                     if(!freshQs[qIndex].answers) freshQs[qIndex].answers = [];
                     
-                    // التحقق مجدداً بعد جلب البيانات الحديثة
                     if(freshQs[qIndex].answers.some(a => a.user === currentUser.nickname)) {
                         alert('لقد قمت بإرسال إجابة لهذا السؤال مسبقاً ولا يمكنك إرسال إجابة أخرى.');
                         btn.disabled = false;
@@ -1458,7 +1477,7 @@
                     freshQs[qIndex].answers.push({ 
                         user: currentUser.nickname, 
                         text: inputVal, 
-                        time: getRealTime(), // إعتماد التوقيت السيرفري العادل بدلاً من ساعة الجهاز المحلي
+                        time: getRealTime(),
                         correct: isCorrect 
                     });
                     
@@ -1487,7 +1506,6 @@
             
             const qNum = dailyQuestions.length + 1;
             
-            // سحب أحدث الداتا لتجنب التلاعب
             db.ref('dailyQuestions').once('value').then(snap => {
                 let freshQs = snap.val() || [];
                 freshQs.push({
@@ -1761,17 +1779,26 @@
             }
         }
 
+        // تم تطبيق نفس التحديث النقطي هنا لضمان عدم مسح قراءات الأعضاء الآخرين للرسالة
         function markBroadcastRead(bId, replyText) {
             if(!replyText) replyText = "بدون رد";
-            const bIndex = broadcasts.findIndex(x => x.id === bId);
-            if(bIndex !== -1) {
-                if(!broadcasts[bIndex].reads) broadcasts[bIndex].reads = [];
-                broadcasts[bIndex].reads.push({ user: currentUser.nickname, time: getRealTime(), reply: replyText });
-                db.ref('broadcasts').set(broadcasts).then(() => {
-                    document.getElementById('broadcastModal').classList.remove('active');
-                    setTimeout(checkBroadcast, 500);
-                });
-            }
+            db.ref('broadcasts').once('value').then(snap => {
+                let freshBroadcasts = snap.val() || [];
+                const bIndex = freshBroadcasts.findIndex(x => x.id === bId);
+                if(bIndex !== -1) {
+                    if(!freshBroadcasts[bIndex].reads) freshBroadcasts[bIndex].reads = [];
+                    if(!freshBroadcasts[bIndex].reads.some(r => r.user === currentUser.nickname)) {
+                        freshBroadcasts[bIndex].reads.push({ user: currentUser.nickname, time: getRealTime(), reply: replyText });
+                        db.ref('broadcasts').set(freshBroadcasts).then(() => {
+                            document.getElementById('broadcastModal').classList.remove('active');
+                            setTimeout(checkBroadcast, 500);
+                        });
+                    } else {
+                        document.getElementById('broadcastModal').classList.remove('active');
+                        setTimeout(checkBroadcast, 500);
+                    }
+                }
+            });
         }
 
         function register() {
