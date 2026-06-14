@@ -320,7 +320,7 @@
                     
                     <button class="btn btn-danger w-full mt-10" onclick="adminSaveMatch()">اعتماد النتيجة وإنهاء المباراة</button>
                 </div>
-                
+             
                 <div class="group-card">
                     <h4 style="color:var(--accent);">طرح سؤال المونديال اليومي</h4>
                     <input type="text" id="adminQText" class="form-control mt-10" placeholder="نص السؤال...">
@@ -596,8 +596,22 @@
             appId: "1:1000049567169:web:2517995981db98ae0dfb40",
             measurementId: "G-C76VSJCECH"
         };
+        
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.database();
+
+        // -----------------------------------------------------
+        // حل جذري لاختلاف توقيت الأجهزة (Client Clock Drift) 
+        // عبر جلب التوقيت الفعلي من سيرفرات فايربيس
+        // -----------------------------------------------------
+        let serverTimeOffset = 0;
+        db.ref('.info/serverTimeOffset').on('value', function(snapshot) {
+            serverTimeOffset = snapshot.val() || 0;
+        });
+
+        function getRealTime() {
+            return Date.now() + serverTimeOffset;
+        }
 
         const GROUPS_DATA = {
             'الأولى': ['المكسيك', 'جنوب أفريقيا', 'كوريا الجنوبية', 'التشيك'], 'الثانية': ['كندا', 'البوسنة', 'قطر', 'سويسرا'],
@@ -607,7 +621,6 @@
             'التاسعة': ['فرنسا', 'السنغال', 'العراق', 'النرويج'], 'العاشرة': ['الأرجنتين', 'الجزائر', 'النمسا', 'الأردن'],
             'الحادية عشرة': ['البرتغال', 'كولومبيا', 'أوزبكستان', 'الكونغو'], 'الثانية عشرة': ['إنجلترا', 'كرواتيا', 'غانا', 'بنما']
         };
-
         const FLAGS = {
             'المكسيك': '🇲🇽', 'جنوب أفريقيا': '🇿🇦', 'كوريا الجنوبية': '🇰🇷', 'التشيك': '🇨🇿',
             'كندا': '🇨🇦', 'البوسنة': '🇧🇦', 'قطر': '🇶🇦', 'سويسرا': '🇨🇭',
@@ -622,7 +635,6 @@
             'البرتغال': '🇵🇹', 'كولومبيا': '🇨🇴', 'أوزبكستان': '🇺🇿', 'الكونغو': '🇨🇩',
             'إنجلترا': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'كرواتيا': '🇭🇷', 'غانا': '🇬🇭', 'بنما': '🇵🇦'
         };
-
         function getFlag(team) { return FLAGS[team] || '🏳️'; }
 
         const FIFTEEN_CITIES = [
@@ -659,21 +671,38 @@
                 predictions = data.predictions || {};
                 news = data.news || ["أهلاً بكم في مونديال التوقعات 2026"];
                 newsSpeed = data.newsSpeed || 25;
-                
+                adsList = data.adsList || [];
+                broadcasts = data.broadcasts || [];
+                broadcasts.forEach(b => { if (!b.reads) b.reads = []; });
+                onlineUsers = data.onlineUsers || {};
+
+                // معالجة بيانات الأسئلة اليومية وتصحيح التواريخ التاريخية المضروبة بسبب ساعات المتسابقين
+                let dailyQsChanged = false;
                 dailyQuestions = data.dailyQuestions || [];
                 dailyQuestions.forEach(q => { 
                     if (!q.answers) q.answers = []; 
                     if (!q.answersList) q.answersList = []; 
+                    
+                    // التصحيح التاريخي: إذا تم رفع إجابات متتالية ولكن تواريخها متلخبطة بسبب اختلاف ساعات الأجهزة، يتم إعادة ضبطها زمنياً بحسب ترتيب دخولها للمصفوفة
+                    if(q.answers.length > 1) {
+                        let needsFix = false;
+                        for(let i = 0; i < q.answers.length - 1; i++) {
+                            if(q.answers[i].time > q.answers[i+1].time) {
+                                needsFix = true; break;
+                            }
+                        }
+                        if(needsFix) {
+                            let baseTime = q.answers[0].time;
+                            q.answers.forEach((ans, idx) => {
+                                ans.time = baseTime + (idx * 1000); // إعطاء فارق ثانية تصاعدي لكل إجابة لضمان الترتيب التاريخي العادل
+                            });
+                            dailyQsChanged = true;
+                        }
+                    }
                 });
-                
-                adsList = data.adsList || [];
-                
-                broadcasts = data.broadcasts || [];
-                broadcasts.forEach(b => { 
-                    if (!b.reads) b.reads = []; 
-                });
-
-                onlineUsers = data.onlineUsers || {};
+                if(dailyQsChanged) {
+                    db.ref('dailyQuestions').set(dailyQuestions);
+                }
 
                 let adminFound = users.find(u => u.phone === "20262026");
                 let usersChanged = false;
@@ -763,7 +792,7 @@
 
         function updateMainCountdown() {
             const target = new Date('2026-06-11T20:30:00+03:00').getTime();
-            const now = new Date().getTime();
+            const now = getRealTime();
             const diff = target - now;
 
             const countdownContainer = document.getElementById('mainCountdownWrapper');
@@ -863,7 +892,7 @@
             const userIndex = users.findIndex(u => u.nickname === nickname);
             if(userIndex !== -1) {
                 if(!users[userIndex].bonuses) users[userIndex].bonuses = [];
-                users[userIndex].bonuses.push({ pts: pts, reason: reason, time: Date.now() });
+                users[userIndex].bonuses.push({ pts: pts, reason: reason, time: getRealTime() });
                 db.ref('users').set(users).then(() => {
                     alert('تم تطبيق التعديل على الرصيد بنجاح.');
                     document.getElementById('adminBonusPoints').value = '';
@@ -945,7 +974,7 @@
             tbody.innerHTML = users.map(u => {
                 let dStr = (u.registeredAt && u.registeredAt > 0) ? new Date(u.registeredAt).toLocaleString('en-GB', { timeZone: 'Asia/Riyadh', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(',', '') : 'تاريخ غير متاح';
                 
-                let isOnline = onlineUsers && onlineUsers[u.nickname] && (Date.now() - onlineUsers[u.nickname].time < 120000);
+                let isOnline = onlineUsers && onlineUsers[u.nickname] && (getRealTime() - onlineUsers[u.nickname].time < 120000);
                 let lsStr = isOnline ? '<span style="color:#4ade80; font-weight:bold;">متصل الآن</span>' : ((u.lastSeen && u.lastSeen > 0) ? new Date(u.lastSeen).toLocaleString('en-GB', { timeZone: 'Asia/Riyadh', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(',', '') : 'غير متوفر');
 
                 let nameHtml = u.isAdmin ? `<span style="color:#e11d48;">${u.nickname} <i class="fas fa-crown"></i></span>` : u.nickname;
@@ -982,9 +1011,11 @@
             const t2 = document.getElementById('adminNewMatchTeam2').value;
             const dateStr = document.getElementById('adminNewMatchDate').value;
             const stage = document.getElementById('adminNewMatchStage').value;
+           
             if(!t1 || !t2 || !dateStr) { alert('يرجى تعبئة جميع الحقول وتحديد التاريخ'); return; }
             if(t1 === t2) { alert('لا يمكن اختيار نفس المنتخب مرتين'); return; }
-            let group1 = null; let group2 = null;
+            let group1 = null;
+            let group2 = null;
             for(let g in GROUPS_DATA) { if(GROUPS_DATA[g].includes(t1)) group1 = g; if(GROUPS_DATA[g].includes(t2)) group2 = g; }
             matches.push({
                 id: Date.now(), team1: t1, team2: t2, date: new Date(dateStr).toISOString(),
@@ -1005,7 +1036,7 @@
             const buildMatchHTML = (m) => {
                 const mDate = new Date(m.date);
                 const mTime = mDate.getTime();
-                const isStarted = mTime <= Date.now();
+                const isStarted = mTime <= getRealTime();
                 const userPred = (currentUser && predictions[m.id]) ? predictions[m.id][currentUser.nickname] : null;
                 let allPredictionsHtml = '';
                 if (isStarted || m.played) {
@@ -1107,14 +1138,14 @@
                 html += allPredictionsHtml;
                 html += `</div>`;
                 return html;
-             };
+              };
 
             upcM.forEach(m => upcomingContainer.innerHTML += buildMatchHTML(m));
             pstM.forEach(m => pastContainer.innerHTML += buildMatchHTML(m));
         }
 
         function updateMatchTimers() {
-            const now = new Date().getTime();
+            const now = getRealTime();
             let needsRender = false;
             matches.forEach(m => {
                 if(!m.played) {
@@ -1204,6 +1235,7 @@
                     const [s1, s2] = [m.score1, m.score2];
                     if(!stats[t1]) return; 
                     stats[t1].pld++; stats[t2].pld++; stats[t1].gf += s1; stats[t1].ga += s2; stats[t2].gf += s2; stats[t2].ga += s1;
+                   
                     if(s1 > s2) { stats[t1].w++; stats[t1].pts += 3; stats[t2].l++; }
                     else if(s1 < s2) { stats[t2].w++; stats[t2].pts += 3; stats[t1].l++; }
                     else { stats[t1].d++; stats[t2].d++; stats[t1].pts++; stats[t2].pts++; }
@@ -1241,29 +1273,34 @@
             });
         }
 
+        // الإصلاح الموجه لحل تصادمات التحكم للإدمن
         function adminForceArchive(qId) {
             if(confirm('هل أنت متأكد من أرشفة هذا السؤال ونقله للأرشيف فوراً؟')) {
-                const q = dailyQuestions.find(x => x.id === qId);
-                if(q) {
-                    q.forceArchive = true;
-                    db.ref('dailyQuestions').set(dailyQuestions).then(() => location.reload());
-                }
+                db.ref('dailyQuestions').once('value').then(snap => {
+                    let freshQs = snap.val() || [];
+                    const qIndex = freshQs.findIndex(x => x.id === qId);
+                    if(qIndex !== -1) {
+                        freshQs[qIndex].forceArchive = true;
+                        db.ref('dailyQuestions').set(freshQs).then(() => location.reload());
+                    }
+                });
             }
         }
 
-        // دالة جديدة لتصحيح أو تخطئة إجابة معينة (للآدمن فقط)
+        // الإصلاح الموجه لمنع المسح التلقائي للإجابات عند تصحيح الإدارة لها
         function adminToggleAnswerStatus(qId, username, isCorrect) {
             if(!confirm('هل أنت متأكد من تغيير حالة هذه الإجابة؟')) return;
-            const qIndex = dailyQuestions.findIndex(x => x.id === qId);
-            if(qIndex !== -1) {
-                const aIndex = dailyQuestions[qIndex].answers.findIndex(a => a.user === username);
-                if(aIndex !== -1) {
-                    dailyQuestions[qIndex].answers[aIndex].correct = isCorrect;
-                    db.ref('dailyQuestions').set(dailyQuestions).then(() => {
-                        location.reload();
-                    });
+            db.ref('dailyQuestions').once('value').then(snap => {
+                let freshQs = snap.val() || [];
+                const qIndex = freshQs.findIndex(x => x.id === qId);
+                if(qIndex !== -1) {
+                    const aIndex = freshQs[qIndex].answers.findIndex(a => a.user === username);
+                    if(aIndex !== -1) {
+                        freshQs[qIndex].answers[aIndex].correct = isCorrect;
+                        db.ref('dailyQuestions').set(freshQs).then(() => location.reload());
+                    }
                 }
-            }
+            });
         }
 
         function renderDailyTab() {
@@ -1277,14 +1314,15 @@
 
             reversedQs.forEach(q => {
                 const pTime = q.publishTime || q.id;
-                const isPublished = Date.now() >= pTime;
+                const isPublished = getRealTime() >= pTime;
                 
                 if (!isPublished && (!currentUser || !currentUser.isAdmin)) return;
-                
+              
                 let scheduledBadge = (!isPublished && currentUser && currentUser.isAdmin) ? `<span style="background:var(--secondary); color:var(--dark); padding:3px 10px; border-radius:6px; font-size:0.8rem; margin-left:10px; font-weight:bold;">⏳ مجدول للنشر: <span class="en-num" style="direction:rtl;">${new Date(pTime).toLocaleString('en-GB', { timeZone: 'Asia/Riyadh', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(',', '')}</span></span>` : '';
 
                 const qDate = new Date(pTime);
                 let archiveTime = new Date(qDate);
+  
                 if (qDate.getHours() < 12) {
                     archiveTime.setHours(12, 0, 0, 0);
                 } else {
@@ -1292,19 +1330,18 @@
                     archiveTime.setHours(12, 0, 0, 0);
                 }
                 
-                const isArchived = q.forceArchive || (Date.now() >= archiveTime.getTime());
+                const isArchived = q.forceArchive || (getRealTime() >= archiveTime.getTime());
                 
                 let sortedAnswers = [...q.answers].sort((a,b) => a.time - b.time);
                 let ansHtml = sortedAnswers.map(a => {
                     let timeStr = new Date(a.time).toLocaleTimeString('en-US', {hour12: false});
                     let ansUser = users.find(u => u.nickname === a.user);
                     let nameColor = (ansUser && ansUser.isAdmin) ? '#e11d48' : 'var(--text)';
-                    
+             
                     let bgCol = a.correct ? 'rgba(74, 222, 128, 0.15)' : 'rgba(225, 29, 72, 0.15)';
                     let borderCol = a.correct ? '2px solid #4ade80' : '2px solid #e11d48';
                     let iconHtml = a.correct ? '<i class="fas fa-check" style="color:#4ade80;"></i>' : '<i class="fas fa-times" style="color:#e11d48;"></i>';
 
-                    // إضافة أزرار التحكم للآدمن
                     let adminActionHtml = '';
                     if (currentUser && currentUser.isAdmin) {
                         if (!a.correct) {
@@ -1330,7 +1367,7 @@
                     hasActive = true;
                     let userAns = q.answers.find(a => currentUser && a.user === currentUser.nickname);
                     let inputHtml = '';
-                    
+            
                     const regTime = currentUser ? (currentUser.registeredAt || 0) : 0;
                     const canAnswerTime = pTime >= regTime;
                     if (currentUser && !currentUser.isAdmin && !userAns) {
@@ -1343,7 +1380,7 @@
                                 </div>
                             `;
                         } else {
-                            inputHtml = `<div style="margin-top:20px; padding:15px; text-align:center; background:rgba(225,29,72,0.1); border:1px solid #e11d48; border-radius:8px; color:white; font-weight:bold;">عذراً، تم طرح هذا السؤال قبل تسجيلك في الموقع ولا يمكنك المشاركة فيه. ستتمكن من المشاركة ابتداءً من الأسئلة القادمة.</div>`;
+                             inputHtml = `<div style="margin-top:20px; padding:15px; text-align:center; background:rgba(225,29,72,0.1); border:1px solid #e11d48; border-radius:8px; color:white; font-weight:bold;">عذراً، تم طرح هذا السؤال قبل تسجيلك في الموقع ولا يمكنك المشاركة فيه. ستتمكن من المشاركة ابتداءً من الأسئلة القادمة.</div>`;
                         }
                     }
                     
@@ -1391,25 +1428,55 @@
             }
         }
 
+        // الإصلاح الموجه والنهائي لمنع الكتابة الفوقية والتصادم (Race Conditions)
+        // بالإضافة لإعتماد الوقت الحقيقي الدقيق من السيرفرات (Real Server Time)
         function submitDailyAnswer(qId, btn) {
-            const q = dailyQuestions.find(x => x.id === qId);
-            if(q.answers.some(a => a.user === currentUser.nickname)) {
-                alert('لقد قمت بإرسال إجابة لهذا السؤال مسبقاً ولا يمكنك إرسال إجابة أخرى.');
-                return;
-            }
             const inputVal = document.getElementById(`dqAnswer_${qId}`).value.trim();
             if(!inputVal) return;
             
             btn.disabled = true;
-            const isCorrect = q.answersList.some(ans => ans === inputVal);
-            q.answers.push({ user: currentUser.nickname, text: inputVal, time: Date.now(), correct: isCorrect });
-            db.ref('dailyQuestions').set(dailyQuestions).then(() => location.reload());
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+            
+            // جلب البيانات بشكل استباقي لتجنب الكتابة الفوقية إذا دخل متسابق آخر قبل أجزاء من الثانية
+            db.ref('dailyQuestions').once('value').then(snap => {
+                let freshQs = snap.val() || [];
+                let qIndex = freshQs.findIndex(x => x.id === qId);
+                
+                if(qIndex !== -1) {
+                    if(!freshQs[qIndex].answers) freshQs[qIndex].answers = [];
+                    
+                    // التحقق مجدداً بعد جلب البيانات الحديثة
+                    if(freshQs[qIndex].answers.some(a => a.user === currentUser.nickname)) {
+                        alert('لقد قمت بإرسال إجابة لهذا السؤال مسبقاً ولا يمكنك إرسال إجابة أخرى.');
+                        btn.disabled = false;
+                        btn.innerHTML = 'إرسال الإجابة الآن';
+                        location.reload();
+                        return;
+                    }
+                    
+                    const isCorrect = freshQs[qIndex].answersList.some(ans => ans === inputVal);
+                    freshQs[qIndex].answers.push({ 
+                        user: currentUser.nickname, 
+                        text: inputVal, 
+                        time: getRealTime(), // إعتماد التوقيت السيرفري العادل بدلاً من ساعة الجهاز المحلي
+                        correct: isCorrect 
+                    });
+                    
+                    db.ref('dailyQuestions').set(freshQs).then(() => {
+                        location.reload();
+                    }).catch(err => {
+                        alert('حدث خطأ بالاتصال، يرجى المحاولة مرة أخرى.');
+                        btn.disabled = false;
+                        btn.innerHTML = 'إرسال الإجابة الآن';
+                    });
+                }
+            });
         }
 
         function adminPostQuestion() {
             const text = document.getElementById('adminQText').value.trim();
             const publishTimeInput = document.getElementById('adminQPublishTime').value;
-            let publishTime = publishTimeInput ? new Date(publishTimeInput).getTime() : Date.now();
+            let publishTime = publishTimeInput ? new Date(publishTimeInput).getTime() : getRealTime();
             
             let answersList = [];
             for(let i=1; i<=10; i++) {
@@ -1419,10 +1486,15 @@
             if(!text || answersList.length === 0) { alert('يرجى كتابة السؤال ونموذج إجابة صحيح واحد على الأقل'); return; }
             
             const qNum = dailyQuestions.length + 1;
-            dailyQuestions.push({
-                id: Date.now(), qNum: qNum, text: text, answersList: answersList, answers: [], forceArchive: false, publishTime: publishTime
+            
+            // سحب أحدث الداتا لتجنب التلاعب
+            db.ref('dailyQuestions').once('value').then(snap => {
+                let freshQs = snap.val() || [];
+                freshQs.push({
+                    id: Date.now(), qNum: qNum, text: text, answersList: answersList, answers: [], forceArchive: false, publishTime: publishTime
+                });
+                db.ref('dailyQuestions').set(freshQs).then(() => { alert('تم حفظ السؤال بنجاح'); location.reload(); });
             });
-            db.ref('dailyQuestions').set(dailyQuestions).then(() => { alert('تم حفظ السؤال بنجاح'); location.reload(); });
         }
 
         function renderLeaderboard() {
@@ -1432,7 +1504,7 @@
                 return { name: u.nickname, avatar: u.avatar, points: res.total, isAdmin: u.isAdmin, registeredAt: u.registeredAt || 0 };
             }).sort((a, b) => {
                 if (b.points !== a.points) return b.points - a.points;
-                 return a.registeredAt - b.registeredAt;
+                return a.registeredAt - b.registeredAt;
             });
             tbody.innerHTML = board.map((u, i) => {
                 let avatarTag = u.avatar ? `<img src="${u.avatar}" class="user-avatar" style="vertical-align:middle; width:40px; height:40px; margin-left:10px;">` : `<i class="fas fa-user-circle" style="font-size:2.5rem; color:var(--text-muted); vertical-align:middle; margin-left:10px;"></i>`;
@@ -1483,9 +1555,8 @@
             const container = document.getElementById('userProfileDetails');
             let avatarHtml = user.avatar ? `<img src="${user.avatar}" style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:3px solid var(--secondary); margin-bottom:10px;">` : `<i class="fas fa-user-circle" style="font-size:5rem; color:var(--text-muted); margin-bottom:10px; display:block;"></i>`;
             let regDateStr = (user.registeredAt && user.registeredAt > 0) ? new Date(user.registeredAt).toLocaleString('en-GB', { timeZone: 'Asia/Riyadh', hour12: true, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(',', '') : 'تاريخ غير متاح';
-            
             let onlineStatusHtml = '';
-            if (onlineUsers && onlineUsers[user.nickname] && (Date.now() - onlineUsers[user.nickname].time < 120000)) {
+            if (onlineUsers && onlineUsers[user.nickname] && (getRealTime() - onlineUsers[user.nickname].time < 120000)) {
                 onlineStatusHtml = '<span style="color:#4ade80; font-weight:bold;">متصل الآن 🟢</span>';
             } else {
                 let lsDate = (user.lastSeen && user.lastSeen > 0) ? new Date(user.lastSeen).toLocaleString('en-GB', { timeZone: 'Asia/Riyadh', hour12: true, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(',', '') : 'غير متوفر';
@@ -1493,7 +1564,6 @@
             }
 
             let nameColor = user.isAdmin ? '#e11d48' : 'var(--secondary-light)';
-            
             let uploadHtml = '';
             if (currentUser && currentUser.nickname === user.nickname) {
                 if (currentUser.isAdmin || !user.hasChangedAvatar) {
@@ -1696,7 +1766,7 @@
             const bIndex = broadcasts.findIndex(x => x.id === bId);
             if(bIndex !== -1) {
                 if(!broadcasts[bIndex].reads) broadcasts[bIndex].reads = [];
-                broadcasts[bIndex].reads.push({ user: currentUser.nickname, time: Date.now(), reply: replyText });
+                broadcasts[bIndex].reads.push({ user: currentUser.nickname, time: getRealTime(), reply: replyText });
                 db.ref('broadcasts').set(broadcasts).then(() => {
                     document.getElementById('broadcastModal').classList.remove('active');
                     setTimeout(checkBroadcast, 500);
@@ -1782,14 +1852,14 @@
             if(currentUser) {
                 const uIndex = users.findIndex(u => u.nickname === currentUser.nickname);
                 if(uIndex !== -1) {
-                    db.ref('users/' + uIndex + '/lastSeen').set(Date.now());
+                    db.ref('users/' + uIndex + '/lastSeen').set(getRealTime());
                 }
                 if(onlineUsers && onlineUsers[currentUser.nickname]) {
                     delete onlineUsers[currentUser.nickname];
                     db.ref('onlineUsers').set(onlineUsers);
                 }
             }
-            localStorage.removeItem('wc26_current_user_v6'); 
+            localStorage.removeItem('wc26_current_user_v6');
             location.reload();
         }
 
@@ -1823,13 +1893,13 @@
             if(!currentUser) return;
             db.ref('onlineUsers').once('value').then(snap => {
                 onlineUsers = snap.val() || {};
-                onlineUsers[currentUser.nickname] = { tab: currentUser.activeTab || 'الشروط', time: Date.now() };
+                onlineUsers[currentUser.nickname] = { tab: currentUser.activeTab || 'الشروط', time: getRealTime() };
                 db.ref('onlineUsers').set(onlineUsers);
                 
                 const uIndex = users.findIndex(u => u.nickname === currentUser.nickname);
                 if(uIndex !== -1) {
-                    users[uIndex].lastSeen = Date.now();
-                    db.ref('users/' + uIndex + '/lastSeen').set(Date.now());
+                    users[uIndex].lastSeen = getRealTime();
+                    db.ref('users/' + uIndex + '/lastSeen').set(getRealTime());
                 }
 
                 renderOnlineUsersList();
@@ -1839,7 +1909,7 @@
         function checkOnlineUsers() {
             db.ref('onlineUsers').once('value').then(snap => {
                 onlineUsers = snap.val() || {};
-                let now = Date.now();
+                let now = getRealTime();
                 window.currentOnlineList = [];
                 let changed = false;
                 for(let user in onlineUsers) {
