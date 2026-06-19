@@ -146,6 +146,40 @@
         .rules-list li { margin-bottom: 10px; }
         .rules-list strong { color: var(--text); }
 
+        /* إضافة تنسيقات للأكورديون والتوقعات والإحصائيات */
+        .accordion-header {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 800;
+            color: var(--secondary-light);
+            margin-bottom: 5px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: 0.3s;
+        }
+        .accordion-header:hover { background: rgba(255,255,255,0.15); }
+        .accordion-content {
+            display: none;
+            padding: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .pred-exact { border: 2px solid #4ade80 !important; background: rgba(74, 222, 128, 0.1) !important; }
+        .pred-correct { border: 2px solid #3b82f6 !important; background: rgba(59, 130, 246, 0.1) !important; }
+        .pred-wrong { border: 2px solid #e11d48 !important; background: rgba(225, 29, 72, 0.1) !important; }
+        
+        .stat-badge {
+            background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; text-align: center; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 8px; justify-content: center;
+        }
+        .stat-badge-title { font-size: 0.85rem; color: var(--text-muted); font-weight: bold; }
+        .stat-badge-value { font-size: 1.5rem; font-weight: 800; color: var(--secondary-light); }
+
         @media (max-width: 992px) { .matches-split { grid-template-columns: 1fr; } }
         @media (max-width: 768px) {
             .header-main { flex-direction: column; text-align: center; }
@@ -576,7 +610,7 @@
     </div>
 
     <div class="modal-overlay" id="userProfileModal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 800px;">
             <button class="close-btn" onclick="closeModal('userProfileModal')">&times;</button>
             <div id="userProfileDetails"></div>
         </div>
@@ -596,18 +630,14 @@
             appId: "1:1000049567169:web:2517995981db98ae0dfb40",
             measurementId: "G-C76VSJCECH"
         };
-        
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.database();
 
-        // -----------------------------------------------------
         // حل جذري لاختلاف توقيت الأجهزة (Client Clock Drift) 
-        // -----------------------------------------------------
         let serverTimeOffset = 0;
         db.ref('.info/serverTimeOffset').on('value', function(snapshot) {
             serverTimeOffset = snapshot.val() || 0;
         });
-
         function getRealTime() {
             return Date.now() + serverTimeOffset;
         }
@@ -643,7 +673,6 @@
             { name: 'موسكو', zone: 'Europe/Moscow' }, { name: 'بيونيس آيرس', zone: 'America/Argentina/Buenos_Aires' }, { name: 'الرباط', zone: 'Africa/Casablanca' },
             { name: 'بكين', zone: 'Asia/Shanghai' }, { name: 'غرينتش', zone: 'UTC' }, { name: 'الدوحة', zone: 'Asia/Qatar' }
         ];
-
         let users = [];
         let currentUser = JSON.parse(localStorage.getItem('wc26_current_user_v6')) || null;
         let matches = [];
@@ -680,7 +709,6 @@
                 dailyQuestions.forEach(q => { 
                     if (!q.answers) q.answers = []; 
                     if (!q.answersList) q.answersList = []; 
-                    
                     if(q.answers.length > 1) {
                         let needsFix = false;
                         for(let i = 0; i < q.answers.length - 1; i++) {
@@ -697,9 +725,7 @@
                         }
                     }
                 });
-                if(dailyQsChanged) {
-                    db.ref('dailyQuestions').set(dailyQuestions);
-                }
+                if(dailyQsChanged) { db.ref('dailyQuestions').set(dailyQuestions); }
 
                 let adminFound = users.find(u => u.phone === "20262026");
                 let usersChanged = false;
@@ -713,7 +739,6 @@
                     }
                 }
                 if (usersChanged) db.ref('users').set(users);
-
                 if (currentUser) {
                     const updatedUser = users.find(u => u.nickname === currentUser.nickname);
                     if (updatedUser) {
@@ -729,7 +754,6 @@
                     if (!u.status) u.status = 'active';
                     if (!u.bonuses) u.bonuses = [];
                 });
-
                 isDataLoaded = true;
                 initUI();
                 if(currentUser) updateOnlineStatus();
@@ -739,6 +763,16 @@
                 setInterval(checkOnlineUsers, 5000);
             });
         });
+
+        // Toggle Function for Accordions
+        function toggleAccordion(id) {
+            const el = document.getElementById(id);
+            if(el.style.display === 'block') {
+                el.style.display = 'none';
+            } else {
+                el.style.display = 'block';
+            }
+        }
 
         function initUI() {
             updateUserNav(); renderNews(); populateTeamSelects(); renderGroups(); renderMatches(); renderLeaderboard();
@@ -902,18 +936,43 @@
         function calculateUserPoints(username) {
             let total = 0;
             let details = [];
+            
+            let stats = {
+                totalMatchesPlayed: 0,
+                userPredictedMatches: 0,
+                userMissedMatches: 0,
+                exactPredictions: 0,
+                correctPredictions: 0,
+                jokersUsed: 0,
+                totalQsArchived: 0,
+                userAnsweredQs: 0,
+                userWrongQs: 0,
+                userMissedQs: 0,
+                fastest1st: 0,
+                fastest2nd: 0,
+                fastest3rd: 0,
+                correctZeroPts: 0
+            };
+
             matches.filter(m => m.played).forEach(m => {
+                stats.totalMatchesPlayed++;
                 if(predictions[m.id] && predictions[m.id][username]) {
+                    stats.userPredictedMatches++;
                     const p = predictions[m.id][username];
+                    if(p.joker) stats.jokersUsed++;
+                    
                     const m1 = m.score1, m2 = m.score2, p1 = p.s1, p2 = p.s2;
                     const actualWinner = m1 > m2 ? 1 : (m1 < m2 ? 2 : 0);
                     const predWinner = p1 > p2 ? 1 : (p1 < p2 ? 2 : 0);
                     let pts = 0; let desc = '';
+                    
                     if (actualWinner === predWinner) {
                         if (m1 === p1 && m2 === p2) {
+                            stats.exactPredictions++;
                             pts = p.joker ? 6 : 3;
                             desc = `توقع دقيق لنتيجة: <div style="display:inline-flex; align-items:center; gap:5px; direction:rtl; margin:0 5px; font-weight:bold;"><span style="color:var(--secondary-light)">${m.team1}</span><span class="en-num" style="color:var(--accent)">${m1}</span><span style="color:var(--text)">-</span><span class="en-num" style="color:var(--accent)">${m2}</span><span style="color:var(--secondary-light)">${m.team2}</span></div> ${p.joker ? '<span style="color:var(--accent)">(جوكر)</span>' : ''}`;
                         } else {
+                            stats.correctPredictions++;
                             pts = p.joker ? 2 : 1; 
                             desc = `توقع الفائز في مباراة: <div style="display:inline-flex; align-items:center; gap:5px; direction:rtl; margin:0 5px; font-weight:bold;"><span style="color:var(--secondary-light)">${m.team1}</span><span class="en-num" style="color:var(--accent)">${m1}</span><span style="color:var(--text)">-</span><span class="en-num" style="color:var(--accent)">${m2}</span><span style="color:var(--secondary-light)">${m.team2}</span></div> ${p.joker ? '<span style="color:var(--accent)">(جوكر)</span>' : ''}`;
                         }
@@ -921,16 +980,35 @@
                     if(pts > 0) { total += pts; details.push({desc, pts}); }
                 }
             });
+            stats.userMissedMatches = stats.totalMatchesPlayed - stats.userPredictedMatches;
+
             dailyQuestions.forEach(q => {
-                const correctAnswers = q.answers.filter(a => a.correct).sort((a,b) => a.time - b.time);
-                const userAnsIndex = correctAnswers.findIndex(a => a.user === username);
-                if(userAnsIndex !== -1) {
-                    let pts = 0; let descRank = "";
-                    if(userAnsIndex === 0) { pts = 4; descRank = "أسرع إجابة صحيحة"; }
-                    else if(userAnsIndex === 1) { pts = 1; descRank = "ثاني أسرع إجابة صحيحة"; }
-                    else if(userAnsIndex === 2) { pts = 1; descRank = "ثالث أسرع إجابة صحيحة"; }
-                    if(pts > 0) {
-                        total += pts; details.push({desc: `إجابة السؤال اليومي رقم (${q.qNum}) (${descRank})`, pts});
+                const pTime = q.publishTime || q.id;
+                const isPublished = getRealTime() >= pTime;
+                
+                if (isPublished) {
+                    stats.totalQsArchived++;
+                    const userAns = q.answers.find(a => a.user === username);
+                    if (userAns) {
+                        stats.userAnsweredQs++;
+                        if (!userAns.correct) {
+                            stats.userWrongQs++;
+                        } else {
+                            const correctAnswers = q.answers.filter(a => a.correct).sort((a,b) => a.time - b.time);
+                            const userAnsIndex = correctAnswers.findIndex(a => a.user === username);
+                            let pts = 0; let descRank = "";
+                            
+                            if(userAnsIndex === 0) { pts = 4; descRank = "أسرع إجابة صحيحة"; stats.fastest1st++; }
+                            else if(userAnsIndex === 1) { pts = 1; descRank = "ثاني أسرع إجابة صحيحة"; stats.fastest2nd++; }
+                            else if(userAnsIndex === 2) { pts = 1; descRank = "ثالث أسرع إجابة صحيحة"; stats.fastest3rd++; }
+                            else { stats.correctZeroPts++; }
+
+                            if(pts > 0) {
+                                total += pts; details.push({desc: `إجابة السؤال اليومي رقم (${q.qNum}) (${descRank})`, pts});
+                            }
+                        }
+                    } else {
+                        stats.userMissedQs++;
                     }
                 }
             });
@@ -943,7 +1021,7 @@
                 });
             }
 
-            return { total, details };
+            return { total, details, stats };
         }
 
         function adminChangeUserStatus(nickname, newStatus) {
@@ -970,12 +1048,9 @@
             }
             tbody.innerHTML = users.map(u => {
                 let dStr = (u.registeredAt && u.registeredAt > 0) ? new Date(u.registeredAt).toLocaleString('en-GB', { timeZone: 'Asia/Riyadh', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(',', '') : 'تاريخ غير متاح';
-                
                 let isOnline = onlineUsers && onlineUsers[u.nickname] && (getRealTime() - onlineUsers[u.nickname].time < 120000);
                 let lsStr = isOnline ? '<span style="color:#4ade80; font-weight:bold;">متصل الآن</span>' : ((u.lastSeen && u.lastSeen > 0) ? new Date(u.lastSeen).toLocaleString('en-GB', { timeZone: 'Asia/Riyadh', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(',', '') : 'غير متوفر');
-
                 let nameHtml = u.isAdmin ? `<span style="color:#e11d48;">${u.nickname} <i class="fas fa-crown"></i></span>` : u.nickname;
-                
                 let statusSelect = u.isAdmin ? `<span style="color:var(--text-muted); font-size:0.8rem;">مدير النظام</span>` : `
                     <select class="form-control" style="width: auto; padding: 5px; font-size:0.85rem;" onchange="adminChangeUserStatus('${u.nickname}', this.value)">
                         <option value="active" ${u.status === 'active' ? 'selected' : ''}>نشط</option>
@@ -1011,8 +1086,7 @@
            
             if(!t1 || !t2 || !dateStr) { alert('يرجى تعبئة جميع الحقول وتحديد التاريخ'); return; }
             if(t1 === t2) { alert('لا يمكن اختيار نفس المنتخب مرتين'); return; }
-            let group1 = null;
-            let group2 = null;
+            let group1 = null; let group2 = null;
             for(let g in GROUPS_DATA) { if(GROUPS_DATA[g].includes(t1)) group1 = g; if(GROUPS_DATA[g].includes(t2)) group2 = g; }
             matches.push({
                 id: Date.now(), team1: t1, team2: t2, date: new Date(dateStr).toISOString(),
@@ -1026,19 +1100,22 @@
             const upcomingContainer = document.getElementById('upcomingMatches');
             const pastContainer = document.getElementById('pastMatches');
             upcomingContainer.innerHTML = ''; pastContainer.innerHTML = '';
+            
             const upcM = matches.filter(m => !m.played).sort((a,b) => new Date(a.date) - new Date(b.date));
             const pstM = matches.filter(m => m.played).sort((a,b) => new Date(b.date) - new Date(a.date));
+            
             if(upcM.length === 0) upcomingContainer.innerHTML = '<div style="text-align:center; color:var(--text-muted);">لا توجد مباريات مدرجة حالياً.</div>';
             if(pstM.length === 0) pastContainer.innerHTML = '<div style="text-align:center; color:var(--text-muted);">لا توجد مباريات سابقة.</div>';
             
-            const buildMatchHTML = (m) => {
+            // Rendering Upcoming Matches
+            const buildUpcomingMatchHTML = (m) => {
                 const mDate = new Date(m.date);
                 const mTime = mDate.getTime();
                 const isStarted = mTime <= getRealTime();
                 const userPred = (currentUser && predictions[m.id]) ? predictions[m.id][currentUser.nickname] : null;
                 let allPredictionsHtml = '';
                 
-                if (isStarted || m.played) {
+                if (isStarted) {
                     let preds = predictions[m.id];
                     if (preds && Object.keys(preds).length > 0) {
                         let predCards = Object.keys(preds).map(username => {
@@ -1073,86 +1150,134 @@
                             <span style="color:var(--secondary-light); font-weight:800;">${m.group !== 'إقصائية' ? `المجموعة ${m.group}` : m.stage}</span>
                             <div style="text-align:left;">
                                 <span class="en-num" style="font-size:0.9rem">${mDate.toLocaleDateString('en-US')} ${mDate.toLocaleTimeString('en-US',{hour:'2-digit', minute:'2-digit'})}</span>
-                                ${!m.played ? `<br><span id="timer-${m.id}" class="match-timer en-num" ${isStarted ? 'style="background-color:#e11d48; color:white;"' : ''}>${isStarted ? 'STARTED' : 'جاري الحساب...'}</span>` : ''}
+                                <br><span id="timer-${m.id}" class="match-timer en-num" ${isStarted ? 'style="background-color:#e11d48; color:white;"' : ''}>${isStarted ? 'STARTED' : 'جاري الحساب...'}</span>
                             </div>
                         </div>`;
-                        
-                if(!m.played) {
-                    if (userPred) {
+                
+                if (userPred) {
+                    html += `
+                    <div style="background:rgba(255,255,255,0.03); padding:15px; border-radius:8px; text-align:center; border: 1px solid rgba(255,255,255,0.05);">
+                        <h4 style="color:var(--secondary-light); margin-bottom:15px;"><i class="fas fa-check-circle"></i> تم حفظ توقعك لهذه المباراة</h4>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div style="flex:1; text-align:right; font-size:1.3rem; font-weight:800; display:flex; align-items:center; gap:8px;">${getFlag(m.team1)} <span>${m.team1}</span></div>
+                            <div style="display:flex; align-items:center; gap:10px; direction:rtl; background:rgba(0,0,0,0.4); padding:10px 20px; border-radius:12px; border:1px solid var(--accent);">
+                                <span class="en-num" style="color:var(--accent); font-size:1.5rem; font-weight:bold;">${userPred.s1}</span>
+                                <span style="color:white; font-size:1.5rem;">-</span>
+                                <span class="en-num" style="color:var(--accent); font-size:1.5rem; font-weight:bold;">${userPred.s2}</span>
+                            </div>
+                            <div style="flex:1; text-align:left; font-size:1.3rem; font-weight:800; display:flex; align-items:center; justify-content:flex-end; gap:8px;"><span>${m.team2}</span> ${getFlag(m.team2)}</div>
+                        </div>
+                        ${userPred.joker ? '<div style="margin-top:10px; color:var(--secondary-light); font-weight:bold;"><i class="fas fa-star"></i> تم تفعيل بطاقة الجوكر 🃏</div>' : ''}
+                    </div>`;
+                } else {
+                    if (isStarted) {
                         html += `
-                        <div style="background:rgba(255,255,255,0.03); padding:15px; border-radius:8px; text-align:center; border: 1px solid rgba(255,255,255,0.05);">
-                            <h4 style="color:var(--secondary-light); margin-bottom:15px;"><i class="fas fa-check-circle"></i> تم حفظ توقعك لهذه المباراة</h4>
+                        <div style="background:rgba(255,255,255,0.03); padding:15px; border-radius:8px; text-align:center;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; opacity:0.5;">
+                                <div style="flex:1; text-align:right; font-size:1.3rem; font-weight:800; display:flex; align-items:center; gap:8px;">${getFlag(m.team1)} <span>${m.team1}</span></div>
+                                <div style="flex:1; text-align:left; font-size:1.3rem; font-weight:800; display:flex; align-items:center; justify-content:flex-end; gap:8px;"><span>${m.team2}</span> ${getFlag(m.team2)}</div>
+                            </div>
+                            <div style="color:#e11d48; font-weight:800; font-size:1.1rem; margin-top:15px;"><i class="fas fa-lock"></i> أُغلقت التوقعات (المباراة بدأت)</div>
+                        </div>`;
+                    } else {
+                        const s1 = ''; const s2 = ''; const jActive = '';
+                        const allowedJokerStages = ['المجموعات', 'دور الـ32', 'دور الـ16'];
+                        const showJoker = allowedJokerStages.includes(m.stage);
+                        html += `
+                        <div style="background:rgba(255,255,255,0.03); padding:15px; border-radius:8px;">
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <div style="flex:1; text-align:right; font-size:1.3rem; font-weight:800; display:flex; align-items:center; gap:8px;">${getFlag(m.team1)} <span>${m.team1}</span></div>
-                                <div style="display:flex; align-items:center; gap:10px; direction:rtl; background:rgba(0,0,0,0.4); padding:10px 20px; border-radius:12px; border:1px solid var(--accent);">
-                                    <span class="en-num" style="color:var(--accent); font-size:1.5rem; font-weight:bold;">${userPred.s1}</span>
-                                    <span style="color:white; font-size:1.5rem;">-</span>
-                                    <span class="en-num" style="color:var(--accent); font-size:1.5rem; font-weight:bold;">${userPred.s2}</span>
+                                <div style="display:flex; align-items:center; gap:10px; direction:rtl;">
+                                    <input type="number" id="pred_${m.id}_1" class="score-input en-num" value="${s1}" min="0">
+                                    <span style="color:var(--accent); font-weight:bold; font-size:1.2rem;">-</span>
+                                    <input type="number" id="pred_${m.id}_2" class="score-input en-num" value="${s2}" min="0">
                                 </div>
                                 <div style="flex:1; text-align:left; font-size:1.3rem; font-weight:800; display:flex; align-items:center; justify-content:flex-end; gap:8px;"><span>${m.team2}</span> ${getFlag(m.team2)}</div>
                             </div>
-                            ${userPred.joker ? '<div style="margin-top:10px; color:var(--secondary-light); font-weight:bold;"><i class="fas fa-star"></i> تم تفعيل بطاقة الجوكر 🃏</div>' : ''}
+                            ${currentUser ? `
+                            <div class="prediction-controls mt-10" id="pred-area-${m.id}" style="display: flex; justify-content: center; align-items: center; gap: 15px; flex-wrap: wrap;">
+                                ${showJoker ? `<button class="joker-btn ${jActive}" onclick="toggleJoker(${m.id}, this)">🃏 تفعيل الجوكر</button>` : ''}
+                                <button class="btn btn-primary" onclick="savePrediction(${m.id}, this)">حفظ التوقع</button>
+                            </div>` : `<div style="text-align:center; margin-top:15px; color:var(--text-muted); font-weight:bold;">سجل دخول لتتوقع النتيجة</div>`}
                         </div>`;
-                    } else {
-                        if (isStarted) {
-                            html += `
-                            <div style="background:rgba(255,255,255,0.03); padding:15px; border-radius:8px; text-align:center;">
-                                <div style="display:flex; justify-content:space-between; align-items:center; opacity:0.5;">
-                                    <div style="flex:1; text-align:right; font-size:1.3rem; font-weight:800; display:flex; align-items:center; gap:8px;">${getFlag(m.team1)} <span>${m.team1}</span></div>
-                                    <div style="flex:1; text-align:left; font-size:1.3rem; font-weight:800; display:flex; align-items:center; justify-content:flex-end; gap:8px;"><span>${m.team2}</span> ${getFlag(m.team2)}</div>
-                                </div>
-                                <div style="color:#e11d48; font-weight:800; font-size:1.1rem; margin-top:15px;"><i class="fas fa-lock"></i> أُغلقت التوقعات (المباراة بدأت)</div>
-                            </div>`;
-                        } else {
-                            const s1 = ''; const s2 = ''; const jActive = '';
-                            const allowedJokerStages = ['المجموعات', 'دور الـ32', 'دور الـ16'];
-                            const showJoker = allowedJokerStages.includes(m.stage);
-                            html += `
-                            <div style="background:rgba(255,255,255,0.03); padding:15px; border-radius:8px;">
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <div style="flex:1; text-align:right; font-size:1.3rem; font-weight:800; display:flex; align-items:center; gap:8px;">${getFlag(m.team1)} <span>${m.team1}</span></div>
-                                    <div style="display:flex; align-items:center; gap:10px; direction:rtl;">
-                                        <input type="number" id="pred_${m.id}_1" class="score-input en-num" value="${s1}" min="0">
-                                        <span style="color:var(--accent); font-weight:bold; font-size:1.2rem;">-</span>
-                                        <input type="number" id="pred_${m.id}_2" class="score-input en-num" value="${s2}" min="0">
-                                    </div>
-                                    <div style="flex:1; text-align:left; font-size:1.3rem; font-weight:800; display:flex; align-items:center; justify-content:flex-end; gap:8px;"><span>${m.team2}</span> ${getFlag(m.team2)}</div>
-                                </div>
-                                ${currentUser ? `
-                                <div class="prediction-controls mt-10" id="pred-area-${m.id}" style="display: flex; justify-content: center; align-items: center; gap: 15px; flex-wrap: wrap;">
-                                    ${showJoker ? `<button class="joker-btn ${jActive}" onclick="toggleJoker(${m.id}, this)">🃏 تفعيل الجوكر</button>` : ''}
-                                    <button class="btn btn-primary" onclick="savePrediction(${m.id}, this)">حفظ التوقع</button>
-                                </div>` : `<div style="text-align:center; margin-top:15px; color:var(--text-muted); font-weight:bold;">سجل دخول لتتوقع النتيجة</div>`}
-                            </div>`;
-                        }
-                    }
-                } else {
-                    html += `
-                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 1.4rem; font-weight: 800; margin-bottom: 20px;">
-                            <div style="flex:1; text-align:right;">${getFlag(m.team1)} ${m.team1}</div>
-                            <div style="padding:0 20px; display:flex; gap:10px; direction:rtl; justify-content:center;">
-                                <span class="en-num" style="color:var(--accent);">${m.score1}</span>
-                                <span style="color:var(--text);">-</span>
-                                <span class="en-num" style="color:var(--accent);">${m.score2}</span>
-                            </div>
-                            <div style="flex:1; text-align:left;">${m.team2} ${getFlag(m.team2)}</div>
-                        </div>`;
-                        
-                    if(userPred) {
-                        html += `<div style="text-align:center; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
-                            <span style="color:var(--secondary-light)">توقعك كان: <div style="display:inline-flex; align-items:center; gap:5px; direction:rtl; margin:0 10px;"><span class="en-num">${userPred.s1}</span> <span style="color:var(--text);">-</span> <span class="en-num">${userPred.s2}</span></div> ${userPred.joker ? '<span style="color:var(--accent);">(باستخدام الجوكر 🃏)</span>' : ''}</span>
-                        </div>`;
-                    } else if(currentUser) { 
-                        html += `<div style="text-align:center; color:var(--text-muted)">لم تقم بوضع توقع.</div>`; 
                     }
                 }
+                
                 html += allPredictionsHtml;
                 html += `</div>`;
                 return html;
-              };
+            };
 
-            upcM.forEach(m => upcomingContainer.innerHTML += buildMatchHTML(m));
-            pstM.forEach(m => pastContainer.innerHTML += buildMatchHTML(m));
+            // Rendering Past Matches (Accordions)
+            const buildPastMatchHTML = (m) => {
+                const mDate = new Date(m.date);
+                let preds = predictions[m.id];
+                let predCards = '';
+                
+                if (preds && Object.keys(preds).length > 0) {
+                    predCards = Object.keys(preds).map(username => {
+                        let p = preds[username];
+                        let userObj = users.find(u => u.nickname === username);
+                        let nameColor = (userObj && userObj.isAdmin) ? '#e11d48' : 'var(--text)';
+                        
+                        const m1 = m.score1, m2 = m.score2, p1 = p.s1, p2 = p.s2;
+                        const actualWinner = m1 > m2 ? 1 : (m1 < m2 ? 2 : 0);
+                        const predWinner = p1 > p2 ? 1 : (p1 < p2 ? 2 : 0);
+                        
+                        let statusClass = 'pred-wrong';
+                        if (actualWinner === predWinner) {
+                            if (m1 === p1 && m2 === p2) statusClass = 'pred-exact';
+                            else statusClass = 'pred-correct';
+                        }
+
+                        return `<div class="${statusClass}" style="border-radius:8px; padding:10px; text-align:center; transition:0.3s;">
+                            <div style="font-size:0.85rem; font-weight:bold; color:${nameColor}; margin-bottom:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${username}</div>
+                            <div style="display:flex; justify-content:center; align-items:center; gap:5px; direction:rtl; font-weight:bold; background:rgba(0,0,0,0.5); border-radius:4px; padding:4px 5px;">
+                                <span class="en-num" style="color:var(--accent);">${p.s1}</span> <span style="color:white;">-</span> <span class="en-num" style="color:var(--accent);">${p.s2}</span>
+                            </div>
+                            ${p.joker ? '<div style="font-size:0.8rem; color:var(--secondary-light); margin-top:5px;"><i class="fas fa-star"></i> جوكر 🃏</div>' : ''}
+                        </div>`;
+                    }).join('');
+                } else {
+                    predCards = `<div style="grid-column: 1 / -1; color:var(--text-muted); font-size:0.9rem; text-align:center;">لم يقم أحد بتوقع هذه المباراة.</div>`;
+                }
+
+                let accId = `past-match-${m.id}`;
+                let stageTxt = m.group !== 'إقصائية' ? `المجموعة ${m.group}` : m.stage;
+                let dateTxt = `${mDate.toLocaleDateString('en-US')} ${mDate.toLocaleTimeString('en-US',{hour:'2-digit', minute:'2-digit'})}`;
+
+                return `
+                <div class="accordion-header" onclick="toggleAccordion('${accId}')" style="display:flex; flex-direction:column; align-items: stretch; gap: 10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size: 0.85rem; color: var(--text-muted);">
+                        <span>${stageTxt}</span>
+                        <span class="en-num">${dateTxt}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size: 1.1rem;">
+                        <div style="flex:1; text-align:right;">${getFlag(m.team1)} ${m.team1}</div>
+                        <div style="padding:0 15px; display:flex; gap:10px; direction:rtl; justify-content:center; font-size:1.3rem;">
+                            <span class="en-num" style="color:var(--accent);">${m.score1}</span>
+                            <span style="color:var(--text);">-</span>
+                            <span class="en-num" style="color:var(--accent);">${m.score2}</span>
+                        </div>
+                        <div style="flex:1; text-align:left;">${m.team2} ${getFlag(m.team2)}</div>
+                    </div>
+                    <i class="fas fa-chevron-down" style="align-self: center; opacity: 0.5; margin-top: 5px;"></i>
+                </div>
+                <div id="${accId}" class="accordion-content">
+                    <h5 style="color:var(--secondary-light); margin-bottom:15px; text-align:center;"><i class="fas fa-eye"></i> توقعات المتسابقين لهذه المباراة</h5>
+                    <div style="display:flex; justify-content:center; gap:15px; margin-bottom:15px; flex-wrap:wrap; font-size:0.8rem; font-weight:bold;">
+                        <span style="color:#4ade80;"><i class="fas fa-square"></i> توقع دقيق</span>
+                        <span style="color:#3b82f6;"><i class="fas fa-square"></i> توقع صحيح بنتيجة مختلفة</span>
+                        <span style="color:#e11d48;"><i class="fas fa-square"></i> توقع خاطئ</span>
+                    </div>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap:10px;">
+                        ${predCards}
+                    </div>
+                </div>`;
+            };
+
+            upcM.forEach(m => upcomingContainer.innerHTML += buildUpcomingMatchHTML(m));
+            pstM.forEach(m => pastContainer.innerHTML += buildPastMatchHTML(m));
         }
 
         function updateMatchTimers() {
@@ -1228,14 +1353,12 @@
             const s2 = document.getElementById(`pred_${matchId}_2`).value;
             const jokerBtn = document.querySelector(`#pred_${matchId}_1`).closest('.match-card').querySelector('.joker-btn');
             const joker = jokerBtn ? jokerBtn.classList.contains('active') : false;
-            
             if(s1 === '' || s2 === '') { alert('يرجى إدخال النتيجة للطرفين'); return; }
 
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
 
             const predRef = db.ref(`predictions/${matchId}/${currentUser.nickname}`);
-            
             predRef.once('value').then(snap => {
                 if(snap.exists()) {
                     alert('لقد قمت بإرسال التوقع لهذه المباراة مسبقاً ولا يمكنك إرساله مرتين.');
@@ -1367,7 +1490,7 @@
                 
                 let sortedAnswers = [...q.answers].sort((a,b) => a.time - b.time);
                 let ansHtml = sortedAnswers.map(a => {
-                    let timeStr = new Date(a.time).toLocaleTimeString('en-US', {hour12: false});
+                    let timeStr = new Date(a.time).toLocaleTimeString('en-US', {hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit'});
                     let ansUser = users.find(u => u.nickname === a.user);
                     let nameColor = (ansUser && ansUser.isAdmin) ? '#e11d48' : 'var(--text)';
              
@@ -1413,7 +1536,7 @@
                                 </div>
                             `;
                         } else {
-                             inputHtml = `<div style="margin-top:20px; padding:15px; text-align:center; background:rgba(225,29,72,0.1); border:1px solid #e11d48; border-radius:8px; color:white; font-weight:bold;">عذراً، تم طرح هذا السؤال قبل تسجيلك في الموقع ولا يمكنك المشاركة فيه. ستتمكن من المشاركة ابتداءً من الأسئلة القادمة.</div>`;
+                            inputHtml = `<div style="margin-top:20px; padding:15px; text-align:center; background:rgba(225,29,72,0.1); border:1px solid #e11d48; border-radius:8px; color:white; font-weight:bold;">عذراً، تم طرح هذا السؤال قبل تسجيلك في الموقع ولا يمكنك المشاركة فيه. ستتمكن من المشاركة ابتداءً من الأسئلة القادمة.</div>`;
                         }
                     }
                     
@@ -1441,16 +1564,22 @@
                         </div>
                     `;
                 } else {
+                    // Archived Questions inside Accordions
+                    let accId = `archive-q-${q.id}`;
                     archiveArea.innerHTML += `
-                        <div style="background:rgba(0,0,0,0.05); padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid rgba(255,255,255,0.05); text-align:right;">
-                            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:10px;">
-                                <h4 style="color:var(--secondary-light); margin:0;">السؤال رقم (${q.qNum}): ${q.text}</h4>
+                        <div class="accordion-header" onclick="toggleAccordion('${accId}')">
+                            <span style="font-size: 1.1rem;"><i class="fas fa-folder-open" style="margin-left: 8px; color: var(--accent);"></i> السؤال اليومي رقم (${q.qNum})</span>
+                            <div>
                                 ${scheduledBadge}
+                                <i class="fas fa-chevron-down" style="opacity: 0.5;"></i>
                             </div>
-                            ${currentUser && currentUser.isAdmin ? `<div style="color:var(--accent); margin-bottom:10px; font-weight:bold;">نماذج الإجابة الصحيحة المقبولة: ${q.answersList.join(' ، ')}</div>` : ''}
-                            <h5 style="color:var(--text); margin-bottom:5px;">سجل الإجابات:</h5>
-                            <div style="max-height:300px; overflow-y:auto; padding-left:10px; border-right:2px solid rgba(255,255,255,0.1); margin-right:5px; padding-top:10px;">
-                                ${ansHtml || '<div style="color:var(--text-muted); font-size:0.8rem;">لا توجد إجابات.</div>'}
+                        </div>
+                        <div id="${accId}" class="accordion-content">
+                            <h4 style="color:var(--secondary-light); margin-bottom:15px; font-size: 1.2rem;">${q.text}</h4>
+                            ${currentUser && currentUser.isAdmin ? `<div style="color:var(--accent); margin-bottom:10px; font-weight:bold; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">نماذج الإجابة الصحيحة المقبولة: ${q.answersList.join(' ، ')}</div>` : ''}
+                            <h5 style="color:var(--text); margin-bottom:10px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 5px;">سجل الإجابات:</h5>
+                            <div style="max-height:300px; overflow-y:auto; padding-left:10px; padding-top:10px;">
+                                ${ansHtml || '<div style="color:var(--text-muted); font-size:0.9rem; text-align:center;">لا توجد إجابات.</div>'}
                             </div>
                         </div>
                     `;
@@ -1490,7 +1619,6 @@
                         time: getRealTime(),
                         correct: isCorrect 
                     });
-                    
                     db.ref('dailyQuestions').set(freshQs).then(() => {
                         location.reload();
                     }).catch(err => {
@@ -1515,7 +1643,6 @@
             if(!text || answersList.length === 0) { alert('يرجى كتابة السؤال ونموذج إجابة صحيح واحد على الأقل'); return; }
             
             const qNum = dailyQuestions.length + 1;
-            
             db.ref('dailyQuestions').once('value').then(snap => {
                 let freshQs = snap.val() || [];
                 freshQs.push({
@@ -1606,6 +1733,29 @@
                 }
             }
             
+            // شبكة الإحصائيات الشاملة
+            let statsGridHtml = `
+                <h4 style="margin-top:20px; margin-bottom:15px; color:var(--text);"><i class="fas fa-chart-pie"></i> إحصائيات المتسابق:</h4>
+                <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap:10px; margin-bottom: 25px;">
+                    <div class="stat-badge"><span class="stat-badge-title">مباريات ملعوبة</span><span class="stat-badge-value en-num">${res.stats.totalMatchesPlayed}</span></div>
+                    <div class="stat-badge"><span class="stat-badge-title">مباريات توقعها</span><span class="stat-badge-value en-num" style="color:#4ade80;">${res.stats.userPredictedMatches}</span></div>
+                    <div class="stat-badge"><span class="stat-badge-title">مباريات فاتته</span><span class="stat-badge-value en-num" style="color:#e11d48;">${res.stats.userMissedMatches}</span></div>
+                    
+                    <div class="stat-badge"><span class="stat-badge-title">توقع دقيق للنتيجة</span><span class="stat-badge-value en-num" style="color:#4ade80;">${res.stats.exactPredictions}</span></div>
+                    <div class="stat-badge"><span class="stat-badge-title">توقع نتيجة (مختلفة)</span><span class="stat-badge-value en-num" style="color:#3b82f6;">${res.stats.correctPredictions}</span></div>
+                    <div class="stat-badge"><span class="stat-badge-title">بطاقات الجوكر 🃏</span><span class="stat-badge-value en-num" style="color:var(--secondary);">${res.stats.jokersUsed}/5</span></div>
+                    
+                    <div class="stat-badge"><span class="stat-badge-title">أسئلة أجابها</span><span class="stat-badge-value en-num">${res.stats.userAnsweredQs}</span></div>
+                    <div class="stat-badge"><span class="stat-badge-title">إجابات خاطئة</span><span class="stat-badge-value en-num" style="color:#e11d48;">${res.stats.userWrongQs}</span></div>
+                    <div class="stat-badge"><span class="stat-badge-title">أسئلة فاتته</span><span class="stat-badge-value en-num" style="color:#e11d48;">${res.stats.userMissedQs}</span></div>
+                    
+                    <div class="stat-badge"><span class="stat-badge-title">المركز الأول (أسرع)</span><span class="stat-badge-value en-num" style="color:var(--secondary);">${res.stats.fastest1st}</span></div>
+                    <div class="stat-badge"><span class="stat-badge-title">المركز الثاني</span><span class="stat-badge-value en-num" style="color:#94a3b8;">${res.stats.fastest2nd}</span></div>
+                    <div class="stat-badge"><span class="stat-badge-title">المركز الثالث</span><span class="stat-badge-value en-num" style="color:#b45309;">${res.stats.fastest3rd}</span></div>
+                    <div class="stat-badge"><span class="stat-badge-title">إجابة صحيحة (بلا نقاط)</span><span class="stat-badge-value en-num" style="color:var(--text-muted);">${res.stats.correctZeroPts}</span></div>
+                </div>
+            `;
+
             let profileHtml = `
                 <div style="text-align:center; margin-bottom:20px;">
                     ${avatarHtml}
@@ -1616,6 +1766,8 @@
                     <p style="color:var(--text-muted); font-size:0.9rem; margin-top:5px;">${onlineStatusHtml}</p>
                     <div style="margin-top:15px; font-weight:bold; font-size:1.2rem; color:var(--text);">إجمالي النقاط: <span class="en-num" style="color:var(--accent); background:rgba(0,0,0,0.05); padding:5px 15px; border-radius:8px;">${res.total}</span></div>
                 </div>
+                <hr style="border-color:rgba(255,255,255,0.1); margin-bottom:15px;">
+                ${statsGridHtml}
                 <hr style="border-color:rgba(255,255,255,0.1); margin-bottom:15px;">
                 <h4 style="margin-bottom:15px; color:var(--text);"><i class="fas fa-history"></i> سجل النقاط المكتسبة:</h4>
                 <div style="max-height: 40vh; overflow-y: auto; padding-left: 10px;">
@@ -1798,10 +1950,7 @@
                     if(!freshBroadcasts[bIndex].reads) freshBroadcasts[bIndex].reads = [];
                     if(!freshBroadcasts[bIndex].reads.some(r => r.user === currentUser.nickname)) {
                         freshBroadcasts[bIndex].reads.push({ user: currentUser.nickname, time: getRealTime(), reply: replyText });
-                        
-                        // التحديث الفوري للذاكرة المؤقتة (Local Array) لمنع تكرار ظهور الرسالة
                         broadcasts = freshBroadcasts;
-
                         db.ref('broadcasts').set(freshBroadcasts).then(() => {
                             document.getElementById('broadcastModal').classList.remove('active');
                             setTimeout(checkBroadcast, 500);
@@ -1961,6 +2110,7 @@
                         changed = true;
                     }
                 }
+               
                 if(changed) db.ref('onlineUsers').set(onlineUsers);
                 renderOnlineUsersList();
             });
