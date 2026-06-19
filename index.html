@@ -1022,7 +1022,6 @@
             db.ref('matches').set(matches).then(() => { alert('تمت إضافة المباراة بنجاح.'); location.reload(); });
         }
 
-        // تم تطبيق الإصلاح هنا لمنع حلقة الإعادة (Render Loop) التي كانت تجمّد الحقول
         function renderMatches() {
             const upcomingContainer = document.getElementById('upcomingMatches');
             const pastContainer = document.getElementById('pastMatches');
@@ -1095,7 +1094,6 @@
                             ${userPred.joker ? '<div style="margin-top:10px; color:var(--secondary-light); font-weight:bold;"><i class="fas fa-star"></i> تم تفعيل بطاقة الجوكر 🃏</div>' : ''}
                         </div>`;
                     } else {
-                        // التصميم الجديد: التحقق من الانطلاق مباشرة داخل عملية الرسم لمنع التضارب
                         if (isStarted) {
                             html += `
                             <div style="background:rgba(255,255,255,0.03); padding:15px; border-radius:8px; text-align:center;">
@@ -1157,7 +1155,6 @@
             pstM.forEach(m => pastContainer.innerHTML += buildMatchHTML(m));
         }
 
-        // تم تحسين الدالة لمنع أي تحديث متكرر يضر بالصفحة
         function updateMatchTimers() {
             const now = getRealTime();
             let needsRender = false;
@@ -1178,7 +1175,7 @@
                                 timerEl.innerText = 'STARTED';
                                 timerEl.style.backgroundColor = '#e11d48'; 
                                 timerEl.style.color = 'white';
-                                needsRender = true; // طلب التحديث لمرة واحدة فقط لقفل الحقول
+                                needsRender = true; 
                             }
                         }
                     }
@@ -1801,11 +1798,16 @@
                     if(!freshBroadcasts[bIndex].reads) freshBroadcasts[bIndex].reads = [];
                     if(!freshBroadcasts[bIndex].reads.some(r => r.user === currentUser.nickname)) {
                         freshBroadcasts[bIndex].reads.push({ user: currentUser.nickname, time: getRealTime(), reply: replyText });
+                        
+                        // التحديث الفوري للذاكرة المؤقتة (Local Array) لمنع تكرار ظهور الرسالة
+                        broadcasts = freshBroadcasts;
+
                         db.ref('broadcasts').set(freshBroadcasts).then(() => {
                             document.getElementById('broadcastModal').classList.remove('active');
                             setTimeout(checkBroadcast, 500);
                         });
                     } else {
+                        broadcasts = freshBroadcasts;
                         document.getElementById('broadcastModal').classList.remove('active');
                         setTimeout(checkBroadcast, 500);
                     }
