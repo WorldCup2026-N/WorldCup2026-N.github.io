@@ -143,8 +143,10 @@
         .rules-list strong { color: var(--text); }
 
         .accordion-header {
-            background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; cursor: pointer; display: flex; justify-content: space-between;
-            align-items: center; font-weight: 800; color: var(--secondary-light); margin-bottom: 5px; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s;
+            background: rgba(255,255,255,0.05);
+            padding: 15px; border-radius: 8px; cursor: pointer; display: flex; justify-content: space-between;
+            align-items: center; font-weight: 800; color: var(--secondary-light); margin-bottom: 5px;
+            border: 1px solid rgba(255,255,255,0.1); transition: 0.3s;
         }
         .accordion-header:hover { background: rgba(255,255,255,0.15); }
         .accordion-content { display: none; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); }
@@ -174,7 +176,7 @@
             gap: 35px;
             min-width: 1400px; 
             direction: ltr; 
-            position: relative; /* ضروري لثبات الـ SVG بداخله */
+            position: relative;
             z-index: 2;
         }
         
@@ -194,11 +196,10 @@
         }
 
         .world-cup-trophy {
-            height: 100px; /* حجم معقول ومتوسط */
+            height: 100px;
             object-fit: contain;
             margin: 0 15px;
             filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
-            /* تم حذف حركة التموج (Animation) كما طلبت */
         }
         
         .bracket-match {
@@ -286,7 +287,7 @@
         }
         
         .bracket-team.loser .diamond-flag {
-            background: #444; 
+            background: #444;
             box-shadow: none;
         }
         
@@ -297,7 +298,6 @@
         .bracket-team.winner .diamond-flag { box-shadow: 0 0 12px gold; border: 1px solid white; }
         .bracket-team.winner .team-name { color: var(--secondary-light); }
 
-        /* توهج الجوكر للمباراة النهائية */
         @keyframes jokerGlow {
             0% { box-shadow: 0 0 10px var(--secondary); transform: scale(1); }
             100% { box-shadow: 0 0 25px var(--secondary); transform: scale(1.02); }
@@ -312,7 +312,7 @@
             background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.35));
             border: 2px solid var(--secondary);
             border-radius: 12px;
-            animation: jokerGlow 1.5s infinite alternate; /* توهج الجوكر */
+            animation: jokerGlow 1.5s infinite alternate;
             padding: 15px 25px;
         }
         
@@ -323,7 +323,6 @@
             flex: 1;
         }
 
-        /* توهج برونزي للمركز الثالث */
         @keyframes bronzeGlow {
             0% { box-shadow: 0 0 10px #cd7f32; transform: scale(1); }
             100% { box-shadow: 0 0 25px #cd7f32; transform: scale(1.02); }
@@ -335,11 +334,13 @@
             flex-direction: row;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(135deg, rgba(205, 127, 50, 0.15), rgba(205, 127, 50, 0.35));
+            background: linear-gradient(135deg, rgba(46, 16, 101, 1), rgba(15, 7, 40, 1));
             border: 2px solid #cd7f32;
             border-radius: 12px;
-            animation: bronzeGlow 1.5s infinite alternate; /* توهج برونزي مشابه للجوكر */
+            animation: bronzeGlow 1.5s infinite alternate;
             padding: 12px 20px;
+            position: relative;
+            z-index: 10;
         }
 
         .exceptional-third-match .third-side {
@@ -353,11 +354,14 @@
             font-weight: 900;
             color: #cd7f32;
             padding: 5px 15px;
-            background: rgba(0,0,0,0.6);
+            background: var(--dark-card);
             border-radius: 8px;
             border: 1px solid #cd7f32;
             margin: 0 15px;
             white-space: nowrap;
+            position: relative;
+            z-index: 15;
+            box-shadow: 0 0 10px #cd7f32;
         }
 
         @media (max-width: 992px) { .matches-split { grid-template-columns: 1fr; } }
@@ -459,6 +463,7 @@
                     <div class="section-title"><i class="fas fa-clock"></i> المباريات القادمة</div>
                     <div id="upcomingMatches"></div>
                 </div>
+    
                 <div class="section-box" style="background: rgba(46, 16, 101, 0.6); border-color: rgba(255,255,255,0.1);">
                     <div class="section-title"><i class="fas fa-check-circle"></i> المباريات السابقة</div>
                     <div id="pastMatches"></div>
@@ -478,7 +483,7 @@
                 <div class="section-title" style="justify-content: center;"><i class="fas fa-project-diagram"></i> مخطط الطريق إلى النهائي</div>
                 <div class="bracket-scroll-area">
                     <div class="bracket-wrapper-vertical" id="knockoutContainer">
-                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -510,6 +515,30 @@
             <div class="section-title" style="color: #e11d48;"><i class="fas fa-cogs"></i> لوحة تحكم الإدارة (رئيس الفيفا)</div>
             <div class="groups-grid">
 
+                <div class="group-card" style="border: 2px solid var(--accent);">
+                    <h4 style="color: var(--accent);">إدارة وتعديل مسارات الإقصائيات (الطريق للنهائي)</h4>
+                    <label class="mt-10" style="color:var(--text-muted); font-size:0.8rem; display:block;">اختر الدور:</label>
+                    <select id="adminKoStage" class="form-control" onchange="populateAdminKoMatches()">
+                        <option value="دور الـ32">دور الـ32</option>
+                        <option value="دور الـ16">دور الـ16</option>
+                        <option value="دور الثمانية">دور الثمانية</option>
+                        <option value="نصف النهائي">نصف النهائي</option>
+                        <option value="تحديد المركز الثالث">تحديد المركز الثالث</option>
+                        <option value="النهائي">النهائي</option>
+                    </select>
+                    <label class="mt-10" style="color:var(--text-muted); font-size:0.8rem; display:block;">رقم المباراة في المخطط:</label>
+                    <select id="adminKoMatchIndex" class="form-control" onchange="loadAdminKoMatchDetails()"></select>
+                    
+                    <div style="display: flex; gap:10px; margin-top:10px;">
+                        <select id="adminKoTeam1" class="form-control"></select>
+                        <select id="adminKoTeam2" class="form-control"></select>
+                    </div>
+                    <label class="mt-10" style="color:var(--text-muted); font-size:0.8rem; display:block;">تاريخ ووقت المباراة:</label>
+                    <input type="datetime-local" id="adminKoDate" class="form-control en-num" style="direction:ltr;">
+                    
+                    <button class="btn btn-primary w-full mt-10" onclick="adminSaveKoMatch()">حفظ المباراة في المخطط</button>
+                </div>
+
                 <div class="group-card" style="border: 1px dashed gold;">
                     <h4 style="color:var(--secondary-light);">إعدادات مخطط الطريق للنهائي</h4>
                     <label class="mt-10" style="display:block; color:var(--text-muted); font-size:0.9rem;">تغيير صورة المركز في وسط خلية النهائي:</label>
@@ -518,17 +547,11 @@
                 </div>
                 
                 <div class="group-card" style="border: 2px solid #e11d48;">
-                    <h4 style="color: var(--secondary-light);">إضافة مباراة قادمة</h4>
+                    <h4 style="color: var(--secondary-light);">إضافة مباراة قادمة (دور المجموعات)</h4>
                     <select id="adminNewMatchTeam1" class="form-control mt-10"></select>
                     <select id="adminNewMatchTeam2" class="form-control mt-10"></select>
                     <select id="adminNewMatchStage" class="form-control mt-10">
                         <option value="المجموعات">دور المجموعات</option>
-                        <option value="دور الـ32">دور الـ32</option>
-                        <option value="دور الـ16">دور الـ16</option>
-                        <option value="دور الثمانية">دور الثمانية</option>
-                        <option value="نصف النهائي">نصف النهائي</option>
-                        <option value="تحديد المركز الثالث">مباراة تحديد المركز الثالث</option>
-                        <option value="النهائي">النهائي</option>
                     </select>
                     <label class="mt-10" style="font-size:0.8rem; color:var(--text-muted); display:block;">تاريخ ووقت المباراة:</label>
                     <input type="datetime-local" id="adminNewMatchDate" class="form-control en-num" style="direction: ltr; text-align: left;">
@@ -536,20 +559,25 @@
                 </div>
 
                 <div class="group-card">
-                    <h4>تحديث نتيجة مباراة (إنهاء)</h4>
+                    <h4>تحديث نتيجة مباراة (إنهاء والتأهيل التلقائي)</h4>
                     <select id="adminMatchSelect" class="form-control mt-10" onchange="updateAdminScoreLabels()"></select>
                     
                     <div style="display: flex; gap:10px; margin-top:15px; align-items:center; justify-content:center; background: rgba(0,0,0,0.2); padding: 15px 10px; border-radius: 8px;">
                         <span id="lblTeam1" style="font-weight:800; color:var(--secondary-light); flex:1; text-align:left;">الفريق الأول</span>
                         <div style="display: flex; gap: 8px; direction: rtl;">
-                            <input type="number" id="adminScore1" class="form-control en-num" style="width:65px; text-align:center; font-size:1.2rem; padding:8px;" placeholder="0">
+                            <input type="number" id="adminScore1" class="form-control en-num" style="width:65px; text-align:center; font-size:1.2rem; padding:8px;" placeholder="0" oninput="checkTieBreaker()">
                             <span style="color:var(--accent); font-weight:bold; font-size:1.5rem; align-self: center;">-</span>
-                            <input type="number" id="adminScore2" class="form-control en-num" style="width:65px; text-align:center; font-size:1.2rem; padding:8px;" placeholder="0">
+                            <input type="number" id="adminScore2" class="form-control en-num" style="width:65px; text-align:center; font-size:1.2rem; padding:8px;" placeholder="0" oninput="checkTieBreaker()">
                         </div>
                         <span id="lblTeam2" style="font-weight:800; color:var(--secondary-light); flex:1; text-align:right;">الفريق الثاني</span>
                     </div>
+
+                    <div id="tieBreakerDiv" style="display:none; margin-top:10px; background: rgba(225,29,72,0.1); padding: 10px; border-radius: 8px; border: 1px solid #e11d48;">
+                        <label style="color:white; font-size:0.85rem; display:block; margin-bottom:5px;">المباراة إقصائية وانتهت بالتعادل. حدد الفائز بركلات الترجيح للتأهل:</label>
+                        <select id="adminTieWinner" class="form-control"></select>
+                    </div>
                     
-                    <button class="btn btn-danger w-full mt-10" onclick="adminSaveMatch()">اعتماد النتيجة وإنهاء المباراة</button>
+                    <button class="btn btn-danger w-full mt-10" onclick="adminSaveMatch()">اعتماد النتيجة والإنهاء</button>
                 </div>
 
                 <div class="group-card" style="border: 1px dashed var(--secondary);">
@@ -832,9 +860,6 @@
     </div>
 
     <script>
-        // -----------------------------------------------------
-        // إعدادات قاعدة بيانات Firebase المباشرة
-        // -----------------------------------------------------
         const firebaseConfig = {
             apiKey: "AIzaSyCR6iZir1myEt9piuwMr4lFzTA9lJatzQY",
             authDomain: "worldcup2026-e25a8.firebaseapp.com",
@@ -862,7 +887,6 @@
             'التاسعة': ['فرنسا', 'السنغال', 'العراق', 'النرويج'], 'العاشرة': ['الأرجنتين', 'الجزائر', 'النمسا', 'الأردن'],
             'الحادية عشرة': ['البرتغال', 'كولومبيا', 'أوزبكستان', 'الكونغو'], 'الثانية عشرة': ['إنجلترا', 'كرواتيا', 'غانا', 'بنما']
         };
-        
         const FLAGS = {
             'المكسيك': '🇲🇽', 'جنوب أفريقيا': '🇿🇦', 'كوريا الجنوبية': '🇰🇷', 'التشيك': '🇨🇿',
             'كندا': '🇨🇦', 'البوسنة': '🇧🇦', 'قطر': '🇶🇦', 'سويسرا': '🇨🇭',
@@ -887,7 +911,6 @@
             { name: 'موسكو', zone: 'Europe/Moscow' }, { name: 'بيونيس آيرس', zone: 'America/Argentina/Buenos_Aires' }, { name: 'الرباط', zone: 'Africa/Casablanca' },
             { name: 'بكين', zone: 'Asia/Shanghai' }, { name: 'غرينتش', zone: 'UTC' }, { name: 'الدوحة', zone: 'Asia/Qatar' }
         ];
-
         let users = [];
         let currentUser = JSON.parse(localStorage.getItem('wc26_current_user_v6')) || null;
         let matches = [];
@@ -933,6 +956,7 @@
                     }
                 }
                 if (usersChanged) db.ref('users').set(users);
+
                 if (currentUser) {
                     const updatedUser = users.find(u => u.nickname === currentUser.nickname);
                     if (updatedUser) {
@@ -948,8 +972,18 @@
                     if (!u.status) u.status = 'active';
                     if (!u.bonuses) u.bonuses = [];
                 });
-                
                 dailyQuestions = data.dailyQuestions || [];
+
+                // ترقية قاعدة البيانات تلقائياً لفهرسة الإقصائيات إن لم تكن مفهرسة
+                let dbMatchesUpdated = false;
+                ['دور الـ32', 'دور الـ16', 'دور الثمانية', 'نصف النهائي', 'تحديد المركز الثالث', 'النهائي'].forEach(stage => {
+                    let stageMatches = matches.filter(m => m.stage === stage);
+                    stageMatches.sort((a,b) => a.id - b.id);
+                    stageMatches.forEach((m, idx) => {
+                        if (m.koIndex === undefined) { m.koIndex = idx; dbMatchesUpdated = true; }
+                    });
+                });
+                if(dbMatchesUpdated) db.ref('matches').set(matches);
 
                 isDataLoaded = true;
                 initUI();
@@ -958,8 +992,6 @@
                 setInterval(updateMainCountdown, 1000);
                 setInterval(updateMatchTimers, 1000); 
                 setInterval(checkOnlineUsers, 5000);
-                
-                // إعادة رسم الخطوط عند تغيير حجم الشاشة للحفاظ على تناسقها
                 window.addEventListener('resize', drawBracketLines);
             });
         });
@@ -985,6 +1017,7 @@
                 document.getElementById('adminPanel').classList.remove('hidden');
                 populateAdminMatchSelect(); 
                 populateAdminEditPastMatchSelect();
+                populateAdminKoMatches();
                 renderAdminAdsList();
                 renderAdminBroadcastHistory(); 
                 renderAdminUsers();
@@ -1010,37 +1043,137 @@
             }
         }
 
+        // ----------------- إدارة مسارات الإقصائيات (الجديد) -----------------
+        function getKoMatch(stage, index) {
+            return matches.find(m => m.stage === stage && m.koIndex === parseInt(index));
+        }
+
+        function getTeamsOptions() {
+            let options = '<option value="يحدد لاحقاً">يحدد لاحقاً (فارغ)</option>';
+            Object.values(GROUPS_DATA).flat().forEach(team => { options += `<option value="${team}">${team}</option>`; });
+            return options;
+        }
+
+        function populateAdminKoMatches() {
+            const stage = document.getElementById('adminKoStage').value;
+            const indexSelect = document.getElementById('adminKoMatchIndex');
+            let count = 1;
+            if(stage === 'دور الـ32') count = 16;
+            if(stage === 'دور الـ16') count = 8;
+            if(stage === 'دور الثمانية') count = 4;
+            if(stage === 'نصف النهائي') count = 2;
+            
+            indexSelect.innerHTML = Array.from({length: count}, (_, i) => `<option value="${i}">المباراة ${i+1} في المخطط</option>`).join('');
+            
+            document.getElementById('adminKoTeam1').innerHTML = getTeamsOptions();
+            document.getElementById('adminKoTeam2').innerHTML = getTeamsOptions();
+            
+            loadAdminKoMatchDetails();
+        }
+
+        function loadAdminKoMatchDetails() {
+            const stage = document.getElementById('adminKoStage').value;
+            const index = document.getElementById('adminKoMatchIndex').value;
+            const m = getKoMatch(stage, index);
+            
+            if(m) {
+                document.getElementById('adminKoTeam1').value = m.team1 || 'يحدد لاحقاً';
+                document.getElementById('adminKoTeam2').value = m.team2 || 'يحدد لاحقاً';
+                
+                if(m.date) {
+                    const d = new Date(m.date);
+                    // Format for datetime-local
+                    const tzOffset = d.getTimezoneOffset() * 60000;
+                    const localISOTime = (new Date(d.getTime() - tzOffset)).toISOString().slice(0, 16);
+                    document.getElementById('adminKoDate').value = localISOTime;
+                } else {
+                    document.getElementById('adminKoDate').value = '';
+                }
+            } else {
+                document.getElementById('adminKoTeam1').value = 'يحدد لاحقاً';
+                document.getElementById('adminKoTeam2').value = 'يحدد لاحقاً';
+                document.getElementById('adminKoDate').value = '';
+            }
+        }
+
+        function updateOrCreateKoMatch(stage, index, teamPos, teamName) {
+            let existing = matches.find(x => x.stage === stage && x.koIndex === index);
+            if (existing) {
+                if (teamPos === 0) existing.team1 = teamName;
+                else existing.team2 = teamName;
+            } else {
+                let newM = {
+                    id: Date.now() + Math.random(),
+                    team1: teamPos === 0 ? teamName : 'يحدد لاحقاً',
+                    team2: teamPos === 1 ? teamName : 'يحدد لاحقاً',
+                    date: new Date().toISOString(),
+                    played: false, score1: null, score2: null,
+                    group: 'إقصائية', stage: stage, koIndex: index
+                };
+                matches.push(newM);
+            }
+        }
+
+        function adminSaveKoMatch() {
+            const stage = document.getElementById('adminKoStage').value;
+            const index = parseInt(document.getElementById('adminKoMatchIndex').value);
+            const t1 = document.getElementById('adminKoTeam1').value;
+            const t2 = document.getElementById('adminKoTeam2').value;
+            const dateStr = document.getElementById('adminKoDate').value;
+
+            if(!dateStr && t1 !== 'يحدد لاحقاً' && t2 !== 'يحدد لاحقاً') {
+                alert('يرجى تحديد تاريخ ووقت المباراة.'); return;
+            }
+
+            let existing = getKoMatch(stage, index);
+            if (existing) {
+                existing.team1 = t1;
+                existing.team2 = t2;
+                if(dateStr) existing.date = new Date(dateStr).toISOString();
+            } else {
+                matches.push({
+                    id: Date.now(),
+                    team1: t1, team2: t2, 
+                    date: dateStr ? new Date(dateStr).toISOString() : new Date().toISOString(),
+                    played: false, score1: null, score2: null,
+                    group: 'إقصائية', stage: stage, koIndex: index
+                });
+            }
+
+            db.ref('matches').set(matches).then(() => {
+                alert('تم حفظ المباراة في المخطط بنجاح.');
+                location.reload();
+            });
+        }
+
+
         // ----------------- بناء المخطط العمودي ورسم خطوط التوصيل الثابتة -----------------
         function getMatchState(m) {
             if (!m || !m.played) return { w: 0, l: 0 };
             if (m.score1 > m.score2) return { w: 1, l: 2 };
             if (m.score2 > m.score1) return { w: 2, l: 1 };
-            return { w: 0, l: 0 }; 
+            return { w: 0, l: 0 };
         }
 
         function renderKnockoutBracket() {
             const container = document.getElementById('knockoutContainer');
             if(!container) return;
             
-            const r32 = matches.filter(m => m.stage === 'دور الـ32');
-            const r16 = matches.filter(m => m.stage === 'دور الـ16');
-            const qf = matches.filter(m => m.stage === 'دور الثمانية');
-            const sf = matches.filter(m => m.stage === 'نصف النهائي');
-            const third = matches.filter(m => m.stage === 'تحديد المركز الثالث');
-            const final = matches.filter(m => m.stage === 'النهائي');
-
-            const padArray = (arr, length) => {
-                const result = [...arr];
-                while (result.length < length) { result.push(null); }
-                return result;
+            const getKoArr = (stage, count) => {
+                let arr = [];
+                for(let i=0; i<count; i++) {
+                    let m = matches.find(x => x.stage === stage && x.koIndex === i);
+                    arr.push(m || null);
+                }
+                return arr;
             };
 
-            const paddedR32 = padArray(r32, 16);
-            const paddedR16 = padArray(r16, 8);
-            const paddedQF = padArray(qf, 4);
-            const paddedSF = padArray(sf, 2);
-            const paddedFinal = padArray(final, 1);
-            const paddedThird = padArray(third, 1);
+            const paddedR32 = getKoArr('دور الـ32', 16);
+            const paddedR16 = getKoArr('دور الـ16', 8);
+            const paddedQF = getKoArr('دور الثمانية', 4);
+            const paddedSF = getKoArr('نصف النهائي', 2);
+            const paddedFinal = getKoArr('النهائي', 1);
+            const paddedThird = getKoArr('تحديد المركز الثالث', 1);
 
             const mDate = (dateStr) => {
                 const d = new Date(dateStr);
@@ -1048,21 +1181,24 @@
             };
 
             const buildMatchHTML = (m, id) => {
-                if(!m) {
+                if(!m || m.team1 === 'يحدد لاحقاً' && m.team2 === 'يحدد لاحقاً') {
+                    let lbl = m ? mDate(m.date) : 'يحدد لاحقاً';
+                    let t1 = m ? m.team1 : 'يحدد لاحقاً';
+                    let t2 = m ? m.team2 : 'يحدد لاحقاً';
                     return `
                     <div class="bracket-match empty-match" id="${id}">
-                        <div class="match-stage-lbl en-num" style="color:var(--text-muted);">يحدد لاحقاً</div>
+                        <div class="match-stage-lbl en-num" style="color:var(--text-muted);">${lbl}</div>
                         <div class="bracket-team">
                             <div style="display:flex; align-items:center; flex:1;">
                                 <div class="diamond-flag" style="background:rgba(255,255,255,0.05); box-shadow:none; border:1px dashed rgba(255,255,255,0.2);"><span class="emoji-flag" style="opacity:0.2;">❔</span></div>
-                                <span class="team-name" style="color:var(--text-muted); text-align:right;">يحدد لاحقاً</span>
+                                <span class="team-name" style="color:var(--text-muted); text-align:right;">${t1}</span>
                             </div>
                             <span class="team-score en-num" style="background:transparent; color:var(--text-muted);">-</span>
                         </div>
                         <div class="bracket-team">
                             <div style="display:flex; align-items:center; flex:1;">
                                 <div class="diamond-flag" style="background:rgba(255,255,255,0.05); box-shadow:none; border:1px dashed rgba(255,255,255,0.2);"><span class="emoji-flag" style="opacity:0.2;">❔</span></div>
-                                <span class="team-name" style="color:var(--text-muted); text-align:right;">يحدد لاحقاً</span>
+                                <span class="team-name" style="color:var(--text-muted); text-align:right;">${t2}</span>
                             </div>
                             <span class="team-score en-num" style="background:transparent; color:var(--text-muted);">-</span>
                         </div>
@@ -1073,19 +1209,25 @@
                 const t1Class = state.w === 1 ? 'winner' : (state.l === 1 ? 'loser' : '');
                 const t2Class = state.w === 2 ? 'winner' : (state.l === 2 ? 'loser' : '');
                 
+                let dFlagStyle1 = m.team1 === 'يحدد لاحقاً' ? 'background:rgba(255,255,255,0.05); box-shadow:none; border:1px dashed rgba(255,255,255,0.2);' : '';
+                let dFlagStyle2 = m.team2 === 'يحدد لاحقاً' ? 'background:rgba(255,255,255,0.05); box-shadow:none; border:1px dashed rgba(255,255,255,0.2);' : '';
+                
+                let emoji1 = m.team1 === 'يحدد لاحقاً' ? '<span style="opacity:0.2;">❔</span>' : getFlag(m.team1);
+                let emoji2 = m.team2 === 'يحدد لاحقاً' ? '<span style="opacity:0.2;">❔</span>' : getFlag(m.team2);
+
                 return `
                 <div class="bracket-match" id="${id}">
                     <div class="match-stage-lbl en-num">${mDate(m.date)}</div>
                     <div class="bracket-team ${t1Class}">
                         <div style="display:flex; align-items:center; flex:1;">
-                            <div class="diamond-flag"><span class="emoji-flag">${getFlag(m.team1)}</span></div>
+                            <div class="diamond-flag" style="${dFlagStyle1}"><span class="emoji-flag">${emoji1}</span></div>
                             <span class="team-name">${m.team1}</span>
                         </div>
                         <span class="team-score en-num">${m.played ? m.score1 : '-'}</span>
                     </div>
                     <div class="bracket-team ${t2Class}">
                         <div style="display:flex; align-items:center; flex:1;">
-                            <div class="diamond-flag"><span class="emoji-flag">${getFlag(m.team2)}</span></div>
+                            <div class="diamond-flag" style="${dFlagStyle2}"><span class="emoji-flag">${emoji2}</span></div>
                             <span class="team-name">${m.team2}</span>
                         </div>
                         <span class="team-score en-num">${m.played ? m.score2 : '-'}</span>
@@ -1102,7 +1244,6 @@
                 return html;
             };
 
-            // بناء خلية النهائي الاستثنائية
             const buildFinalMatchHTML = (m, customImage) => {
                 let state = getMatchState(m);
                 let t1Class = state.w === 1 ? 'winner' : (state.l === 1 ? 'loser' : '');
@@ -1111,16 +1252,16 @@
                 let t2Name = m ? m.team2 : 'يحدد لاحقاً';
                 let s1 = (m && m.played) ? m.score1 : '-';
                 let s2 = (m && m.played) ? m.score2 : '-';
-                let dFlagStyle = m ? '' : 'background:rgba(255,255,255,0.05); box-shadow:none; border:1px dashed rgba(255,255,255,0.2);';
-                let dFlagEmoji1 = m ? getFlag(m.team1) : '<span style="opacity:0.2;">❔</span>';
-                let dFlagEmoji2 = m ? getFlag(m.team2) : '<span style="opacity:0.2;">❔</span>';
-
+                let dFlagStyle1 = t1Name === 'يحدد لاحقاً' ? 'background:rgba(255,255,255,0.05); box-shadow:none; border:1px dashed rgba(255,255,255,0.2);' : '';
+                let dFlagStyle2 = t2Name === 'يحدد لاحقاً' ? 'background:rgba(255,255,255,0.05); box-shadow:none; border:1px dashed rgba(255,255,255,0.2);' : '';
+                let dFlagEmoji1 = t1Name === 'يحدد لاحقاً' ? '<span style="opacity:0.2;">❔</span>' : getFlag(m.team1);
+                let dFlagEmoji2 = t2Name === 'يحدد لاحقاً' ? '<span style="opacity:0.2;">❔</span>' : getFlag(m.team2);
                 return `
                 <div class="bracket-match exceptional-final-match" id="center-final">
                     <div class="match-stage-lbl" style="position: absolute; top: -30px; color: gold; width: 100%; text-align: center; font-size:1.1rem; border:none; text-shadow:0 0 10px gold;">🏆 النهائي الحلم</div>
                     
                     <div class="final-side final-team-right ${t1Class}">
-                        <div class="diamond-flag" style="${dFlagStyle}"><span class="emoji-flag">${dFlagEmoji1}</span></div>
+                        <div class="diamond-flag" style="${dFlagStyle1}"><span class="emoji-flag">${dFlagEmoji1}</span></div>
                         <span class="team-name" style="text-align: right; margin:0;">${t1Name}</span>
                         <span class="team-score en-num" style="font-size:1.4rem; background:rgba(0,0,0,0.7);">${s1}</span>
                     </div>
@@ -1130,14 +1271,13 @@
                     </div>
                     
                     <div class="final-side final-team-left ${t2Class}" style="flex-direction: row-reverse;">
-                        <div class="diamond-flag" style="${dFlagStyle}"><span class="emoji-flag">${dFlagEmoji2}</span></div>
+                        <div class="diamond-flag" style="${dFlagStyle2}"><span class="emoji-flag">${dFlagEmoji2}</span></div>
                         <span class="team-name" style="text-align: left; margin:0;">${t2Name}</span>
                         <span class="team-score en-num" style="font-size:1.4rem; background:rgba(0,0,0,0.7);">${s2}</span>
                     </div>
                 </div>`;
             };
 
-            // بناء خلية المركز الثالث الاستثنائية
             const buildThirdMatchHTML = (m) => {
                 let state = getMatchState(m);
                 let t1Class = state.w === 1 ? 'winner' : (state.l === 1 ? 'loser' : '');
@@ -1146,14 +1286,14 @@
                 let t2Name = m ? m.team2 : 'يحدد لاحقاً';
                 let s1 = (m && m.played) ? m.score1 : '-';
                 let s2 = (m && m.played) ? m.score2 : '-';
-                let dFlagStyle = m ? '' : 'background:rgba(255,255,255,0.05); box-shadow:none; border:1px dashed rgba(255,255,255,0.2);';
-                let dFlagEmoji1 = m ? getFlag(m.team1) : '<span style="opacity:0.2;">❔</span>';
-                let dFlagEmoji2 = m ? getFlag(m.team2) : '<span style="opacity:0.2;">❔</span>';
-
+                let dFlagStyle1 = t1Name === 'يحدد لاحقاً' ? 'background:rgba(255,255,255,0.05); box-shadow:none; border:1px dashed rgba(255,255,255,0.2);' : '';
+                let dFlagStyle2 = t2Name === 'يحدد لاحقاً' ? 'background:rgba(255,255,255,0.05); box-shadow:none; border:1px dashed rgba(255,255,255,0.2);' : '';
+                let dFlagEmoji1 = t1Name === 'يحدد لاحقاً' ? '<span style="opacity:0.2;">❔</span>' : getFlag(m.team1);
+                let dFlagEmoji2 = t2Name === 'يحدد لاحقاً' ? '<span style="opacity:0.2;">❔</span>' : getFlag(m.team2);
                 return `
                 <div class="bracket-match exceptional-third-match" id="center-third">
                     <div class="third-side final-team-right ${t1Class}">
-                        <div class="diamond-flag" style="${dFlagStyle}"><span class="emoji-flag">${dFlagEmoji1}</span></div>
+                        <div class="diamond-flag" style="${dFlagStyle1}"><span class="emoji-flag">${dFlagEmoji1}</span></div>
                         <span class="team-name" style="text-align: right; margin:0;">${t1Name}</span>
                         <span class="team-score en-num" style="font-size:1.2rem; background:rgba(0,0,0,0.7);">${s1}</span>
                     </div>
@@ -1161,7 +1301,7 @@
                     <div class="third-center-badge">المركز الثالث</div>
                     
                     <div class="third-side final-team-left ${t2Class}" style="flex-direction: row-reverse;">
-                        <div class="diamond-flag" style="${dFlagStyle}"><span class="emoji-flag">${dFlagEmoji2}</span></div>
+                        <div class="diamond-flag" style="${dFlagStyle2}"><span class="emoji-flag">${dFlagEmoji2}</span></div>
                         <span class="team-name" style="text-align: left; margin:0;">${t2Name}</span>
                         <span class="team-score en-num" style="font-size:1.2rem; background:rgba(0,0,0,0.7);">${s2}</span>
                     </div>
@@ -1187,21 +1327,16 @@
                 ${buildRow(paddedR32, 8, 8, 'bottom-r32')}
             `;
 
-            // بعد استكمال إضافة العناصر للشاشة، نعطي مهلة بسيطة ثم نرسم خطوط المسارات
             setTimeout(drawBracketLines, 150);
         }
 
-        // دالة رسم خطوط مسارات التأهل باستخدام SVG مع التثبيت الداخلي
         function drawBracketLines() {
             const svg = document.getElementById('bracket-svg-lines');
             const container = document.getElementById('knockoutContainer');
             if(!svg || !container) return;
             
             svg.innerHTML = '';
-            
-            // نعتمد على أبعاد الحاوية الداخلية (container) لكي تظل الخطوط ثابتة أثناء السحب الأفقي
             const containerRect = container.getBoundingClientRect();
-            
             const connectPairs = (el1Id, el2Id, targetId, isTop) => {
                 const el1 = document.getElementById(el1Id);
                 const el2 = document.getElementById(el2Id);
@@ -1212,21 +1347,17 @@
                 const r2 = el2.getBoundingClientRect();
                 const rT = target.getBoundingClientRect();
 
-                // حساب الإحداثيات نسبياً لداخل الحاوية (مما يمنع تأثرها بالتمرير Scroll)
                 const y1 = isTop ? (r1.bottom - containerRect.top) : (r1.top - containerRect.top);
                 const x1 = (r1.left - containerRect.left) + (r1.width / 2);
-                
                 const y2 = isTop ? (r2.bottom - containerRect.top) : (r2.top - containerRect.top);
                 const x2 = (r2.left - containerRect.left) + (r2.width / 2);
 
                 const yT = isTop ? (rT.top - containerRect.top) : (rT.bottom - containerRect.top);
                 const xT = (rT.left - containerRect.left) + (rT.width / 2);
-
                 const midY = (y1 + yT) / 2;
 
                 const path1 = `<path d="M ${x1} ${y1} L ${x1} ${midY} L ${xT} ${midY} L ${xT} ${yT}" fill="none" stroke="var(--secondary)" stroke-width="3" opacity="0.6" />`;
                 const path2 = `<path d="M ${x2} ${y2} L ${x2} ${midY} L ${xT} ${midY} L ${xT} ${yT}" fill="none" stroke="var(--secondary)" stroke-width="3" opacity="0.6" />`;
-                
                 svg.innerHTML += path1 + path2;
             };
 
@@ -1237,32 +1368,27 @@
 
                 const r1 = el.getBoundingClientRect();
                 const rT = target.getBoundingClientRect();
-                
                 const y1 = isTop ? (r1.bottom - containerRect.top) : (r1.top - containerRect.top);
                 const x1 = (r1.left - containerRect.left) + (r1.width / 2);
                 
                 const yT = isTop ? (rT.top - containerRect.top) : (rT.bottom - containerRect.top);
                 const xT = (rT.left - containerRect.left) + (rT.width / 2);
-                
                 const midY = (y1 + yT) / 2;
                 
                 const path = `<path d="M ${x1} ${y1} L ${x1} ${midY} L ${xT} ${midY} L ${xT} ${yT}" fill="none" stroke="var(--secondary)" stroke-width="3" opacity="0.8" />`;
                 svg.innerHTML += path;
             };
 
-            // رسم مسارات النصف الأعلى
             for(let i=0; i<4; i++) connectPairs(`top-r32-${i*2}`, `top-r32-${i*2+1}`, `top-r16-${i}`, true);
             for(let i=0; i<2; i++) connectPairs(`top-r16-${i*2}`, `top-r16-${i*2+1}`, `top-qf-${i}`, true);
             connectPairs(`top-qf-0`, `top-qf-1`, `top-sf-0`, true);
             connectSingle(`top-sf-0`, `center-final`, true);
-
-            // رسم مسارات النصف الأسفل
+            
             for(let i=0; i<4; i++) connectPairs(`bottom-r32-${i*2}`, `bottom-r32-${i*2+1}`, `bottom-r16-${i}`, false);
             for(let i=0; i<2; i++) connectPairs(`bottom-r16-${i*2}`, `bottom-r16-${i*2+1}`, `bottom-qf-${i}`, false);
             connectPairs(`bottom-qf-0`, `bottom-qf-1`, `bottom-sf-0`, false);
             connectSingle(`bottom-sf-0`, `center-final`, false);
         }
-        // ------------------------------------------------------------------
 
         function updateClockTimes() {
             const now = new Date();
@@ -1331,8 +1457,6 @@
             const btn = document.querySelector(`button[onclick="switchTab('${tabId}')"]`);
             if(btn) btn.classList.add('active');
             document.getElementById(tabId).classList.add('active');
-            
-            // إعادة رسم الخطوط لتأكيد أبعاد الشاشة في حال التبديل
             if(tabId === 'knockoutTab') {
                 setTimeout(drawBracketLines, 50);
             }
@@ -1424,22 +1548,11 @@
             let details = [];
             
             let stats = {
-                totalMatchesPlayed: 0,
-                userPredictedMatches: 0,
-                userMissedMatches: 0,
-                exactPredictions: 0,
-                correctPredictions: 0,
-                jokersUsed: 0,
-                totalQsArchived: 0,
-                userAnsweredQs: 0,
-                userWrongQs: 0,
-                userMissedQs: 0,
-                fastest1st: 0,
-                fastest2nd: 0,
-                fastest3rd: 0,
-                correctZeroPts: 0
+                totalMatchesPlayed: 0, userPredictedMatches: 0, userMissedMatches: 0,
+                exactPredictions: 0, correctPredictions: 0, jokersUsed: 0,
+                totalQsArchived: 0, userAnsweredQs: 0, userWrongQs: 0, userMissedQs: 0,
+                fastest1st: 0, fastest2nd: 0, fastest3rd: 0, correctZeroPts: 0
             };
-
             matches.filter(m => m.played).forEach(m => {
                 stats.totalMatchesPlayed++;
                 if(predictions[m.id] && predictions[m.id][username]) {
@@ -1471,7 +1584,7 @@
             dailyQuestions.forEach(q => {
                 const pTime = q.publishTime || q.id;
                 const isPublished = getRealTime() >= pTime;
-                 
+                
                 if (isPublished) {
                     stats.totalQsArchived++;
                     const userAns = (q.answers || []).find(a => a.user === username);
@@ -1500,10 +1613,7 @@
             });
             const userObj = users.find(u => u.nickname === username);
             if(userObj && userObj.bonuses) {
-                userObj.bonuses.forEach(b => {
-                    total += b.pts;
-                    details.push({desc: b.reason, pts: b.pts});
-                });
+                userObj.bonuses.forEach(b => { total += b.pts; details.push({desc: b.reason, pts: b.pts}); });
             }
 
             return { total, details, stats };
@@ -1515,9 +1625,7 @@
                 const uIndex = users.findIndex(u => u.nickname === nickname);
                 if(uIndex !== -1) {
                     users[uIndex].status = newStatus;
-                    db.ref('users').set(users).then(() => {
-                        alert('تم تحديث حالة الحساب بنجاح.');
-                    });
+                    db.ref('users').set(users).then(() => { alert('تم تحديث حالة الحساب بنجاح.'); });
                 }
             } else {
                 renderAdminUsers();
@@ -1571,8 +1679,7 @@
             
             if(!t1 || !t2 || !dateStr) { alert('يرجى تعبئة جميع الحقول وتحديد التاريخ'); return; }
             if(t1 === t2) { alert('لا يمكن اختيار نفس المنتخب مرتين'); return; }
-            let group1 = null;
-            let group2 = null;
+            let group1 = null; let group2 = null;
             for(let g in GROUPS_DATA) { if(GROUPS_DATA[g].includes(t1)) group1 = g; if(GROUPS_DATA[g].includes(t2)) group2 = g; }
             
             matches.push({
@@ -1587,9 +1694,12 @@
             const upcomingContainer = document.getElementById('upcomingMatches');
             const pastContainer = document.getElementById('pastMatches');
             upcomingContainer.innerHTML = ''; pastContainer.innerHTML = '';
-            const upcM = matches.filter(m => !m.played).sort((a,b) => new Date(a.date) - new Date(b.date));
+            
+            // فلترة المباريات القادمة بحيث لا تظهر مباريات الإقصائيات إلا بعد تحديد طرفيها
+            const upcM = matches.filter(m => !m.played && m.team1 && m.team2 && m.team1 !== 'يحدد لاحقاً' && m.team2 !== 'يحدد لاحقاً').sort((a,b) => new Date(a.date) - new Date(b.date));
             const pstM = matches.filter(m => m.played).sort((a,b) => new Date(b.date) - new Date(a.date));
-            if(upcM.length === 0) upcomingContainer.innerHTML = '<div style="text-align:center; color:var(--text-muted);">لا توجد مباريات مدرجة حالياً.</div>';
+            
+            if(upcM.length === 0) upcomingContainer.innerHTML = '<div style="text-align:center; color:var(--text-muted);">لا توجد مباريات مدرجة حالياً أو في انتظار تحديد المتأهلين.</div>';
             if(pstM.length === 0) pastContainer.innerHTML = '<div style="text-align:center; color:var(--text-muted);">لا توجد مباريات سابقة.</div>';
             
             const buildUpcomingMatchHTML = (m) => {
@@ -1847,11 +1957,7 @@
                     return;
                 }
                 
-                predRef.set({
-                    s1: parseInt(s1),
-                    s2: parseInt(s2),
-                    joker: joker
-                }).then(() => {
+                predRef.set({ s1: parseInt(s1), s2: parseInt(s2), joker: joker }).then(() => {
                     alert('تم حفظ التوقع بنجاح!');
                     location.reload();
                 }).catch(err => {
@@ -1873,7 +1979,6 @@
                     const [s1, s2] = [m.score1, m.score2];
                     if(!stats[t1]) return; 
                     stats[t1].pld++; stats[t2].pld++; stats[t1].gf += s1; stats[t1].ga += s2; stats[t2].gf += s2; stats[t2].ga += s1;
-                   
                     if(s1 > s2) { stats[t1].w++; stats[t1].pts += 3; stats[t2].l++; }
                     else if(s1 < s2) { stats[t2].w++; stats[t2].pts += 3; stats[t1].l++; }
                     else { stats[t1].d++; stats[t2].d++; stats[t1].pts++; stats[t2].pts++; }
@@ -2001,7 +2106,6 @@
                     hasActive = true;
                     let userAns = (q.answers || []).find(a => currentUser && a.user === currentUser.nickname);
                     let inputHtml = '';
-            
                     const regTime = currentUser ? (currentUser.registeredAt || 0) : 0;
                     const canAnswerTime = pTime >= regTime;
                     if (currentUser && !currentUser.isAdmin && !userAns) {
@@ -2090,12 +2194,7 @@
                     }
                     
                     const isCorrect = (freshQs[qIndex].answersList||[]).some(ans => ans === inputVal);
-                    freshQs[qIndex].answers.push({ 
-                        user: currentUser.nickname, 
-                        text: inputVal, 
-                        time: getRealTime(),
-                        correct: isCorrect 
-                    });
+                    freshQs[qIndex].answers.push({ user: currentUser.nickname, text: inputVal, time: getRealTime(), correct: isCorrect });
                     db.ref('dailyQuestions').set(freshQs).then(() => {
                         location.reload();
                     }).catch(err => {
@@ -2122,9 +2221,7 @@
             const qNum = dailyQuestions.length + 1;
             db.ref('dailyQuestions').once('value').then(snap => {
                 let freshQs = snap.val() || [];
-                freshQs.push({
-                    id: Date.now(), qNum: qNum, text: text, answersList: answersList, answers: [], forceArchive: false, publishTime: publishTime
-                });
+                freshQs.push({ id: Date.now(), qNum: qNum, text: text, answersList: answersList, answers: [], forceArchive: false, publishTime: publishTime });
                 db.ref('dailyQuestions').set(freshQs).then(() => { alert('تم حفظ السؤال بنجاح'); location.reload(); });
             });
         }
@@ -2162,9 +2259,7 @@
                     const userIndex = users.findIndex(u => u.nickname === currentUser.nickname);
                     if (userIndex !== -1) {
                         users[userIndex].avatar = e.target.result;
-                        if (!users[userIndex].isAdmin) {
-                            users[userIndex].hasChangedAvatar = true;
-                        }
+                        if (!users[userIndex].isAdmin) { users[userIndex].hasChangedAvatar = true; }
                         db.ref('users').set(users).then(() => {
                             currentUser = users[userIndex];
                             localStorage.setItem('wc26_current_user_v6', JSON.stringify(currentUser));
@@ -2258,15 +2353,38 @@
 
         function showPointsDetails() { showUserProfile(currentUser.nickname); }
 
+        function checkTieBreaker() {
+            const id = document.getElementById('adminMatchSelect').value;
+            const m = matches.find(x => x.id == id);
+            if(!m || m.group !== 'إقصائية') { document.getElementById('tieBreakerDiv').style.display = 'none'; return; }
+            
+            const s1 = document.getElementById('adminScore1').value;
+            const s2 = document.getElementById('adminScore2').value;
+            const tieDiv = document.getElementById('tieBreakerDiv');
+            
+            if (s1 !== '' && s2 !== '' && s1 === s2) {
+                tieDiv.style.display = 'block';
+                document.getElementById('adminTieWinner').innerHTML = `<option value="">-- حدد الفريق المتأهل --</option><option value="${m.team1}">${m.team1}</option><option value="${m.team2}">${m.team2}</option>`;
+            } else {
+                tieDiv.style.display = 'none';
+            }
+        }
+
         function updateAdminScoreLabels() {
             const id = document.getElementById('adminMatchSelect').value;
             const m = matches.find(x => x.id == id);
-            if(m) { document.getElementById('lblTeam1').innerText = m.team1; document.getElementById('lblTeam2').innerText = m.team2; }
+            if(m) { 
+                document.getElementById('lblTeam1').innerText = m.team1; 
+                document.getElementById('lblTeam2').innerText = m.team2; 
+                document.getElementById('adminScore1').value = '';
+                document.getElementById('adminScore2').value = '';
+                checkTieBreaker();
+            }
         }
 
         function populateAdminMatchSelect() {
             const select = document.getElementById('adminMatchSelect');
-            select.innerHTML = matches.filter(m=>!m.played).map(m => `<option value="${m.id}">${m.team1} ضد ${m.team2}</option>`).join('');
+            select.innerHTML = matches.filter(m=>!m.played && m.team1 !== 'يحدد لاحقاً' && m.team2 !== 'يحدد لاحقاً').map(m => `<option value="${m.id}">${m.team1} ضد ${m.team2}</option>`).join('');
             if(select.innerHTML !== '') updateAdminScoreLabels();
         }
 
@@ -2276,10 +2394,48 @@
             const s2 = document.getElementById('adminScore2').value;
             if(!id || s1==='' || s2==='') { alert('يرجى تحديد المباراة وكتابة النتيجة كاملة.'); return;}
             const m = matches.find(x => x.id == id);
+            
             if(m) {
+                const s1Int = parseInt(s1);
+                const s2Int = parseInt(s2);
+                
                 m.played = true;
-                m.score1 = parseInt(s1); m.score2 = parseInt(s2);
-                db.ref('matches').set(matches).then(() => { alert('تم اعتماد النتيجة.'); location.reload(); });
+                m.score1 = s1Int; m.score2 = s2Int;
+                
+                // التأهيل التلقائي للإقصائيات
+                if (m.group === 'إقصائية') {
+                    let advanceWinner = '';
+                    let advanceLoser = '';
+                    
+                    if (s1Int > s2Int) { advanceWinner = m.team1; advanceLoser = m.team2; }
+                    else if (s2Int > s1Int) { advanceWinner = m.team2; advanceLoser = m.team1; }
+                    else {
+                        const tieSelect = document.getElementById('adminTieWinner');
+                        if(!tieSelect || !tieSelect.value) {
+                            alert('المباراة انتهت بالتعادل! يرجى تحديد الفريق الفائز بركلات الترجيح لضمان تقدمه في المخطط.');
+                            return; 
+                        }
+                        advanceWinner = tieSelect.value;
+                        advanceLoser = (advanceWinner === m.team1) ? m.team2 : m.team1;
+                    }
+                    
+                    if(m.koIndex !== undefined) {
+                        if (m.stage === 'نصف النهائي') {
+                            updateOrCreateKoMatch('النهائي', 0, m.koIndex, advanceWinner);
+                            updateOrCreateKoMatch('تحديد المركز الثالث', 0, m.koIndex, advanceLoser);
+                        } else {
+                            const nextStageMap = {'دور الـ32':'دور الـ16', 'دور الـ16':'دور الثمانية', 'دور الثمانية':'نصف النهائي'};
+                            let nStage = nextStageMap[m.stage];
+                            if (nStage) {
+                                let nIndex = Math.floor(m.koIndex / 2);
+                                let isTeam1 = (m.koIndex % 2 === 0);
+                                updateOrCreateKoMatch(nStage, nIndex, isTeam1 ? 0 : 1, advanceWinner);
+                            }
+                        }
+                    }
+                }
+
+                db.ref('matches').set(matches).then(() => { alert('تم اعتماد النتيجة والتأهيل التلقائي بنجاح.'); location.reload(); });
             }
         }
 
@@ -2315,7 +2471,7 @@
             const s2 = document.getElementById('adminEditScore2').value;
             if(!id || s1==='' || s2==='') { alert('يرجى تحديد المباراة وكتابة النتيجة المصححة كاملة.'); return;}
             
-            if(!confirm('هل أنت متأكد من تصحيح النتيجة؟ سيتم إعادة حساب نقاط جميع المتسابقين تلقائياً وبشكل فوري بناءً على النتيجة الجديدة.')) return;
+            if(!confirm('هل أنت متأكد من تصحيح النتيجة؟ سيتم إعادة حساب نقاط جميع المتسابقين تلقائياً.')) return;
             const m = matches.find(x => x.id == id);
             if(m) {
                 m.score1 = parseInt(s1);
