@@ -1103,7 +1103,7 @@
                 else existing.team2 = teamName;
             } else {
                 let newM = {
-                    id: Date.now() + Math.random(),
+                    id: Date.now() + Math.floor(Math.random() * 1000), // تفادي المشكلة في المستقبل بمنع توليد كسور عشرية
                     team1: teamPos === 0 ? teamName : 'يحدد لاحقاً',
                     team2: teamPos === 1 ? teamName : 'يحدد لاحقاً',
                     date: new Date().toISOString(),
@@ -1132,7 +1132,7 @@
                 if(dateStr) existing.date = new Date(dateStr).toISOString();
             } else {
                 matches.push({
-                    id: Date.now(),
+                    id: Date.now() + Math.floor(Math.random() * 1000), // تأكيد منع الكسور في الإضافة اليدوية
                     team1: t1, team2: t2, 
                     date: dateStr ? new Date(dateStr).toISOString() : new Date().toISOString(),
                     played: false, score1: null, score2: null,
@@ -1941,8 +1941,12 @@
 
             const s1 = document.getElementById(`pred_${matchId}_1`).value;
             const s2 = document.getElementById(`pred_${matchId}_2`).value;
-            const jokerBtn = document.querySelector(`#pred_${matchId}_1`).closest('.match-card').querySelector('.joker-btn');
+            
+            // استخدام getElementById بدلاً من querySelector لمنع مشاكل النقاط العشرية في الـ ID
+            const inputEl = document.getElementById(`pred_${matchId}_1`);
+            const jokerBtn = inputEl ? inputEl.closest('.match-card').querySelector('.joker-btn') : null;
             const joker = jokerBtn ? jokerBtn.classList.contains('active') : false;
+            
             if(s1 === '' || s2 === '') { alert('يرجى إدخال النتيجة للطرفين'); return; }
 
             btn.disabled = true;
