@@ -496,7 +496,7 @@
             
             <div class="section-box">
                 <div class="section-title"><i class="fas fa-archive"></i> أرشيف أسئلة المونديال</div>
-                <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:15px;">يتحول السؤال اليومي إلى الأرشيف تلقائياً في تمام الساعة 12 ظهراً، ويمكن للأعضاء الجدد الإطلاع على أرشيف الأسئلة السابقة.</p>
+                <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:15px;">يتحول السؤال اليومي إلى الأرشيف تلقائياً في تمام الساعة 12 ظهراً، ويمكن للأ الأعضاء الجدد الإطلاع على أرشيف الأسئلة السابقة.</p>
                 <div id="archiveQuestionsArea"></div>
             </div>
         </div>
@@ -930,6 +930,11 @@
         let currentClockElems = [];
         let isDataLoaded = false;
 
+        // دالة مساعدة لتنظيف الـ ID من النقطة العشرية عند التعامل مع Firebase حصراً
+        function getPredKey(id) {
+            return String(id).replace('.', '_');
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             db.ref('/').once('value').then((snapshot) => {
                 const data = snapshot.val() || {};
@@ -974,7 +979,6 @@
                 });
                 dailyQuestions = data.dailyQuestions || [];
 
-                // ترقية قاعدة البيانات تلقائياً لفهرسة الإقصائيات إن لم تكن مفهرسة
                 let dbMatchesUpdated = false;
                 ['دور الـ32', 'دور الـ16', 'دور الثمانية', 'نصف النهائي', 'تحديد المركز الثالث', 'النهائي'].forEach(stage => {
                     let stageMatches = matches.filter(m => m.stage === stage);
@@ -1026,7 +1030,6 @@
             }
         }
 
-        // ----------------- دالة رفع صورة المركزي للنهائي (لوحة الإدارة) -----------------
         function adminUploadFinalImage() {
             const input = document.getElementById('adminFinalImage');
             if (input.files && input.files[0]) {
@@ -1043,7 +1046,6 @@
             }
         }
 
-        // ----------------- إدارة مسارات الإقصائيات (الجديد) -----------------
         function getKoMatch(stage, index) {
             return matches.find(m => m.stage === stage && m.koIndex === parseInt(index));
         }
@@ -1082,7 +1084,6 @@
                 
                 if(m.date) {
                     const d = new Date(m.date);
-                    // Format for datetime-local
                     const tzOffset = d.getTimezoneOffset() * 60000;
                     const localISOTime = (new Date(d.getTime() - tzOffset)).toISOString().slice(0, 16);
                     document.getElementById('adminKoDate').value = localISOTime;
@@ -1103,7 +1104,7 @@
                 else existing.team2 = teamName;
             } else {
                 let newM = {
-                    id: Date.now() + Math.floor(Math.random() * 1000), // تفادي المشكلة في المستقبل بمنع توليد كسور عشرية
+                    id: Date.now() + Math.floor(Math.random() * 1000), 
                     team1: teamPos === 0 ? teamName : 'يحدد لاحقاً',
                     team2: teamPos === 1 ? teamName : 'يحدد لاحقاً',
                     date: new Date().toISOString(),
@@ -1132,7 +1133,7 @@
                 if(dateStr) existing.date = new Date(dateStr).toISOString();
             } else {
                 matches.push({
-                    id: Date.now() + Math.floor(Math.random() * 1000), // تأكيد منع الكسور في الإضافة اليدوية
+                    id: Date.now() + Math.floor(Math.random() * 1000), 
                     team1: t1, team2: t2, 
                     date: dateStr ? new Date(dateStr).toISOString() : new Date().toISOString(),
                     played: false, score1: null, score2: null,
@@ -1146,8 +1147,6 @@
             });
         }
 
-
-        // ----------------- بناء المخطط العمودي ورسم خطوط التوصيل الثابتة -----------------
         function getMatchState(m) {
             if (!m || !m.played) return { w: 0, l: 0 };
             if (m.score1 > m.score2) return { w: 1, l: 2 };
@@ -1555,9 +1554,10 @@
             };
             matches.filter(m => m.played).forEach(m => {
                 stats.totalMatchesPlayed++;
-                if(predictions[m.id] && predictions[m.id][username]) {
+                const pKey = getPredKey(m.id);
+                if(predictions[pKey] && predictions[pKey][username]) {
                     stats.userPredictedMatches++;
-                    const p = predictions[m.id][username];
+                    const p = predictions[pKey][username];
                     if(p.joker) stats.jokersUsed++;
                     
                     const m1 = m.score1, m2 = m.score2, p1 = p.s1, p2 = p.s2;
@@ -1695,7 +1695,6 @@
             const pastContainer = document.getElementById('pastMatches');
             upcomingContainer.innerHTML = ''; pastContainer.innerHTML = '';
             
-            // فلترة المباريات القادمة بحيث لا تظهر مباريات الإقصائيات إلا بعد تحديد طرفيها
             const upcM = matches.filter(m => !m.played && m.team1 && m.team2 && m.team1 !== 'يحدد لاحقاً' && m.team2 !== 'يحدد لاحقاً').sort((a,b) => new Date(a.date) - new Date(b.date));
             const pstM = matches.filter(m => m.played).sort((a,b) => new Date(b.date) - new Date(a.date));
             
@@ -1703,14 +1702,15 @@
             if(pstM.length === 0) pastContainer.innerHTML = '<div style="text-align:center; color:var(--text-muted);">لا توجد مباريات سابقة.</div>';
             
             const buildUpcomingMatchHTML = (m) => {
+                const pKey = getPredKey(m.id);
                 const mDate = new Date(m.date);
                 const mTime = mDate.getTime();
                 const isStarted = mTime <= getRealTime();
-                const userPred = (currentUser && predictions[m.id]) ? predictions[m.id][currentUser.nickname] : null;
+                const userPred = (currentUser && predictions[pKey]) ? predictions[pKey][currentUser.nickname] : null;
                 let allPredictionsHtml = '';
                 
                 if (isStarted) {
-                    let preds = predictions[m.id];
+                    let preds = predictions[pKey];
                     if (preds && Object.keys(preds).length > 0) {
                         let predCards = Object.keys(preds).map(username => {
                             let p = preds[username];
@@ -1802,8 +1802,9 @@
             };
 
             const buildPastMatchHTML = (m) => {
+                const pKey = getPredKey(m.id);
                 const mDate = new Date(m.date);
-                let preds = predictions[m.id];
+                let preds = predictions[pKey];
                 let predCards = '';
                 
                 if (preds && Object.keys(preds).length > 0) {
@@ -1913,8 +1914,8 @@
                 if(allowed === 0) { alert('غير مسموح باستخدام الجوكر في هذا الدور.'); return; }
 
                 for (const pid in predictions) {
-                    if(pid == matchId) continue;
-                    const pMatch = matches.find(x => x.id == pid);
+                    if(pid === getPredKey(matchId)) continue;
+                    const pMatch = matches.find(x => getPredKey(x.id) === pid);
                     if (pMatch && pMatch.stage === m.stage && predictions[pid][currentUser.nickname] && predictions[pid][currentUser.nickname].joker) {
                         stageUses++;
                     }
@@ -1942,7 +1943,6 @@
             const s1 = document.getElementById(`pred_${matchId}_1`).value;
             const s2 = document.getElementById(`pred_${matchId}_2`).value;
             
-            // استخدام getElementById بدلاً من querySelector لمنع مشاكل النقاط العشرية في الـ ID
             const inputEl = document.getElementById(`pred_${matchId}_1`);
             const jokerBtn = inputEl ? inputEl.closest('.match-card').querySelector('.joker-btn') : null;
             const joker = jokerBtn ? jokerBtn.classList.contains('active') : false;
@@ -1952,7 +1952,9 @@
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
 
-            const predRef = db.ref(`predictions/${matchId}/${currentUser.nickname}`);
+            const predKey = getPredKey(matchId);
+            const predRef = db.ref(`predictions/${predKey}/${currentUser.nickname}`);
+            
             predRef.once('value').then(snap => {
                 if(snap.exists()) {
                     alert('لقد قمت بإرسال التوقع لهذه المباراة مسبقاً ولا يمكنك إرساله مرتين.');
@@ -1965,10 +1967,16 @@
                     alert('تم حفظ التوقع بنجاح!');
                     location.reload();
                 }).catch(err => {
-                    alert('حدث خطأ أثناء الاتصال، يرجى المحاولة مرة أخرى.');
+                    console.error("Firebase Save Error:", err);
+                    alert('حدث خطأ أثناء حفظ التوقع. يرجى المحاولة مرة أخرى لاحقاً.');
                     btn.disabled = false;
                     btn.innerHTML = 'حفظ التوقع';
                 });
+            }).catch(err => {
+                console.error("Firebase Read Error:", err);
+                alert('حدث خطأ فني أثناء الاتصال بالخادم، قد يكون بسبب عدم استقرار الإنترنت لديك. يرجى المحاولة مرة أخرى.');
+                btn.disabled = false;
+                btn.innerHTML = 'حفظ التوقع';
             });
         }
 
@@ -2406,7 +2414,6 @@
                 m.played = true;
                 m.score1 = s1Int; m.score2 = s2Int;
                 
-                // التأهيل التلقائي للإقصائيات
                 if (m.group === 'إقصائية') {
                     let advanceWinner = '';
                     let advanceLoser = '';
